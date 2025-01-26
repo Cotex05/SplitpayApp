@@ -128,7 +128,9 @@ const OverviewRoute = () => {
 
   return (
     <View>
-      <TouchableOpacity activeOpacity={0.8}>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={() => navigation.navigate('BalanceGraph')}>
         <View
           style={{
             height: 100,

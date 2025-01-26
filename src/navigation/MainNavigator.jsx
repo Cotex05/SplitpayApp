@@ -12,6 +12,9 @@ import TabsNavigator from './TabsNavigator';
 import MyUPIsScreen from '../screens/profile/routes/MyUPIs';
 import ManageGroup from '../screens/groups/GroupManager';
 import SettledTransaction from '../screens/settlement/SettledTransaction';
+import Support from '../screens/others/Support';
+import About from '../screens/others/About';
+import BalanceGraph from '../screens/expense/BalanceGraph';
 
 const Stack = createNativeStackNavigator();
 
@@ -38,6 +41,9 @@ function MainNavigator() {
       />
       <Stack.Screen name="MyUPIs" component={MyUPIsScreen} />
       <Stack.Screen name="SettledTransaction" component={SettledTransaction} />
+      <Stack.Screen name="About" component={About} />
+      <Stack.Screen name="Support" component={Support} />
+      <Stack.Screen name="BalanceGraph" component={BalanceGraph} />
     </Stack.Navigator>
   );
 }

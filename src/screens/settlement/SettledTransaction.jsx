@@ -14,6 +14,7 @@ import GlobalStyle from '../../styles/GlobalStyle';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
 import currency from '../../constants/currency';
+import {MutedActionButton} from '../../components/Buttons';
 
 const SettledTransaction = ({route, navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -159,18 +160,7 @@ const SettledTransaction = ({route, navigation}) => {
           display: 'flex',
           alignItems: 'center',
         }}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={{
-            width: 100,
-            height: 60,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <Text style={{color: colors.muted, fontWeight: 'bold', fontSize: 20}}>
-            Close
-          </Text>
-        </TouchableOpacity>
+        <MutedActionButton title="Close" onPress={() => navigation.goBack()} />
       </View>
     </SafeAreaView>
   );

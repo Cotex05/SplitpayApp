@@ -12,7 +12,52 @@ import {darkColors, lightColors} from '../../../constants/colors';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import currency from '../../../constants/currency';
 
-const ExpenseList = () => {
+const sampleExpenses = [
+  {
+    title: 'Icecream',
+    paidBy: 'Mark',
+    amount: 300,
+    paidFor: 'All',
+    date: '17/01/2025',
+  },
+  {
+    title: 'Biryani',
+    paidBy: 'John Doe',
+    amount: 600,
+    paidFor: 'All',
+    date: '18/01/2025',
+  },
+  {
+    title: 'Pizza',
+    paidBy: 'Mark',
+    amount: 900,
+    paidFor: 'All',
+    date: '14/01/2025',
+  },
+  {
+    title: 'Juice',
+    paidBy: 'Mike',
+    amount: 150,
+    paidFor: 'All',
+    date: '19/01/2025',
+  },
+  {
+    title: 'Dinner at restaurant',
+    paidBy: 'Mike',
+    amount: 1200,
+    paidFor: 'All',
+    date: '22/01/2025',
+  },
+  {
+    title: 'Coke',
+    paidBy: 'Mark',
+    amount: 110,
+    paidFor: 'All',
+    date: '18/01/2025',
+  },
+];
+
+const ExpenseList = ({data}) => {
   const navigation = useNavigation();
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -21,7 +66,7 @@ const ExpenseList = () => {
   return (
     <TouchableOpacity
       activeOpacity={0.75}
-      onPress={() => navigation.navigate('Expense')}>
+      onPress={() => navigation.navigate('Expense', {data: data})}>
       <View
         style={{
           display: 'flex',
@@ -29,8 +74,9 @@ const ExpenseList = () => {
           justifyContent: 'space-between',
           backgroundColor: colors.background,
           height: 80,
+          padding: 20,
         }}>
-        <View style={{display: 'flex', flexDirection: 'row', marginLeft: 20}}>
+        <View style={{display: 'flex', flexDirection: 'row'}}>
           <Ionicons
             name="basket"
             size={50}
@@ -54,7 +100,7 @@ const ExpenseList = () => {
                 fontWeight: 'bold',
                 fontSize: 18,
               }}>
-              Food and Juice
+              {data.title}
             </Text>
             <Text
               style={{
@@ -63,20 +109,29 @@ const ExpenseList = () => {
                 fontWeight: 'bold',
                 fontSize: 15,
               }}>
-              John Doe
+              {data.paidBy}
             </Text>
           </View>
         </View>
-        <View
-          style={{display: 'flex', justifyContent: 'center', marginRight: 10}}>
+        <View style={{alignItems: 'flex-end'}}>
           <Text
             style={{
               color: colors.green,
-              padding: 10,
               fontWeight: 'bold',
               fontSize: 20,
             }}>
-            {currency.symbol}100
+            {currency.symbol}
+            {data.amount}
+          </Text>
+          <Text
+            style={{
+              display: 'flex',
+              color: 'gray',
+              fontWeight: 300,
+              paddingVertical: 5,
+              fontSize: 12,
+            }}>
+            {data.date}
           </Text>
         </View>
       </View>
@@ -110,8 +165,8 @@ const ExpensesRoute = () => {
         </Text>
       </View>
       <ScrollView>
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((item, index) => {
-          return <ExpenseList key={index} />;
+        {sampleExpenses.map((item, index) => {
+          return <ExpenseList data={item} key={index} />;
         })}
       </ScrollView>
     </View>

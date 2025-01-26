@@ -14,32 +14,7 @@ import GlobalStyle from '../../styles/GlobalStyle';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
 import currency from '../../constants/currency';
-
-const sampleDetails = [
-  {
-    title: 'Amount',
-    value: `${currency.symbol} 100`,
-  },
-  {
-    title: 'Currency',
-    value: currency.abbreviation,
-  },
-
-  {
-    title: 'Paid By',
-    value: 'John Doe',
-  },
-
-  {
-    title: 'For',
-    value: 'All',
-  },
-
-  {
-    title: 'Created on',
-    value: '15/01/2025',
-  },
-];
+import {MutedActionButton} from '../../components/Buttons';
 
 const ExpenseList = ({title, value}) => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -66,12 +41,38 @@ const ExpenseList = ({title, value}) => {
   );
 };
 
-const Expense = () => {
-  const navigation = useNavigation();
-
+const Expense = ({route, navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
 
   const colors = isDarkMode ? darkColors : lightColors;
+
+  const {data} = route.params;
+
+  const sampleDetails = [
+    {
+      title: 'Amount',
+      value: `${currency.symbol} ${data.amount}`,
+    },
+    {
+      title: 'Currency',
+      value: currency.abbreviation,
+    },
+
+    {
+      title: 'Paid By',
+      value: data.paidBy,
+    },
+
+    {
+      title: 'For',
+      value: data.paidFor,
+    },
+
+    {
+      title: 'Created on',
+      value: data.date,
+    },
+  ];
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.background}}>
@@ -130,14 +131,7 @@ const Expense = () => {
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-            <Text
-              style={{
-                color: colors.tertiary,
-                fontSize: 25,
-                fontWeight: 'bold',
-              }}>
-              {currency.symbol}
-            </Text>
+            <Ionicons name="basket" size={40} color={colors.accent} />
           </View>
           <Text
             style={{
@@ -147,7 +141,7 @@ const Expense = () => {
               textAlign: 'center',
               marginLeft: 20,
             }}>
-            Dinner at restaurant
+            {data.title}
           </Text>
         </View>
       </View>
@@ -160,18 +154,7 @@ const Expense = () => {
           display: 'flex',
           alignItems: 'center',
         }}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={{
-            width: 100,
-            height: 60,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <Text style={{color: colors.muted, fontWeight: 'bold', fontSize: 20}}>
-            Close
-          </Text>
-        </TouchableOpacity>
+        <MutedActionButton title="Close" onPress={() => navigation.goBack()} />
       </View>
     </SafeAreaView>
   );

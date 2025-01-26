@@ -212,7 +212,7 @@ const Profile = () => {
             </View>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Support')}>
           <View
             style={{
               display: 'flex',
@@ -235,7 +235,7 @@ const Profile = () => {
             </View>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('About')}>
           <View
             style={{
               display: 'flex',
@@ -267,7 +267,7 @@ const Profile = () => {
               justifyContent: 'space-between',
               flexDirection: 'row',
             }}>
-            <Text style={{color: colors.error, fontWeight: 600, fontSize: 18}}>
+            <Text style={{color: colors.red, fontWeight: 600, fontSize: 18}}>
               Logout
             </Text>
             <View>
