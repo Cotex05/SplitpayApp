@@ -10,22 +10,28 @@ import {
   Image,
   TextInput,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {darkColors, lightColors} from '../../constants/colors';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
 
-const EditProfile = () => {
-  const [name, setName] = useState('John Doe');
-  const [username, setUsername] = useState('@johndoe');
-  const [email, setEmail] = useState('john.doe@email.com');
+const EditProfile = ({route, navigation}) => {
+  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
 
   const isDarkMode = useColorScheme() === 'dark';
 
   const colors = isDarkMode ? darkColors : lightColors;
 
-  const navigation = useNavigation();
+  const {userData} = route.params;
+
+  useEffect(() => {
+    setUsername(userData?.username);
+    setEmail(userData?.email);
+    setName(userData?.username);
+  }, []);
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.background}}>
@@ -146,7 +152,7 @@ const EditProfile = () => {
           placeholderTextColor={colors.muted}
           onChangeText={setUsername}
           placeholder="Username"
-          value={username}
+          value={`@${username}`}
           editable={false}
           selectTextOnFocus={false}
         />

@@ -8,8 +8,12 @@ import {
   useColorScheme,
   Alert,
   StatusBar,
+  ActivityIndicator,
 } from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {useDispatch, useSelector} from 'react-redux';
+import {userSignUp} from '../../../slices/authSlices';
+import {showToastWithGravity} from '../../../components/native/AndroidComponents';
 
 const RegisterScreen = ({navigation}) => {
   const [username, setUsername] = useState('');
@@ -30,7 +34,10 @@ const RegisterScreen = ({navigation}) => {
     borderColor: isDarkMode ? '#ddd' : Colors.darker,
   };
 
-  const handleRegister = () => {
+  const dispatch = useDispatch();
+  const {loading, error, successMessage} = useSelector(state => state.auth);
+
+  const handleRegister = async () => {
     if (
       username.trim().length === 0 ||
       password.trim().length === 0 ||
@@ -42,7 +49,22 @@ const RegisterScreen = ({navigation}) => {
       );
       return;
     }
-    navigation.navigate('Home');
+
+    try {
+      const resultAction = await dispatch(
+        userSignUp({username, email, password}),
+      );
+
+      console.log('result from handleRegister', resultAction);
+      if (userSignUp.fulfilled.match(resultAction)) {
+        showToastWithGravity(`Registered Successfully, Login now!`);
+        navigation.navigate('Login');
+      } else {
+        console.log('Registration failed:', resultAction.payload);
+      }
+    } catch (err) {
+      console.log('Unexpected error:', err);
+    }
   };
 
   return (
@@ -81,13 +103,21 @@ const RegisterScreen = ({navigation}) => {
         autoCapitalize="none"
       />
 
-      <TouchableOpacity style={[styles.button]} onPress={handleRegister}>
-        <Text style={[styles.buttonText]}>Register</Text>
-      </TouchableOpacity>
+      {loading ? (
+        <ActivityIndicator size="large" color="blue" />
+      ) : (
+        <TouchableOpacity style={[styles.button]} onPress={handleRegister}>
+          <Text style={[styles.buttonText]}>Register</Text>
+        </TouchableOpacity>
+      )}
 
       <TouchableOpacity onPress={() => navigation.navigate('Login')}>
         <Text style={[styles.link]}>Already have an account? Login</Text>
       </TouchableOpacity>
+
+      {error ? (
+        <Text style={{color: 'red', fontSize: 20, padding: 10}}>{error}</Text>
+      ) : null}
     </View>
   );
 };

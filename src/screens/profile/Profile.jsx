@@ -15,6 +15,9 @@ import {darkColors, lightColors} from '../../constants/colors';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
 import {APP_NAME} from '../../constants/names';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {showToastWithGravity} from '../../components/native/AndroidComponents';
+import {useSelector} from 'react-redux';
 
 const Profile = () => {
   const navigation = useNavigation();
@@ -22,6 +25,8 @@ const Profile = () => {
   const isDarkMode = useColorScheme() === 'dark';
 
   const colors = isDarkMode ? darkColors : lightColors;
+
+  const user = useSelector(state => state.auth.user);
 
   const onShare = async () => {
     try {
@@ -39,6 +44,19 @@ const Profile = () => {
       }
     } catch (error) {
       Alert.alert(error.message);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('authUser');
+      showToastWithGravity(`Logout from ${APP_NAME}`);
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'Login'}],
+      });
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -98,7 +116,7 @@ const Profile = () => {
                   textAlign: 'center',
                   marginLeft: 20,
                 }}>
-                John Doe
+                {user?.username}
               </Text>
               <Text
                 style={{
@@ -109,13 +127,15 @@ const Profile = () => {
                   textAlign: 'center',
                   marginLeft: 20,
                 }}>
-                @johndoe
+                @{user?.username}
               </Text>
             </View>
           </View>
           <View>
             <TouchableOpacity
-              onPress={() => navigation.navigate('EditProfile')}>
+              onPress={() =>
+                navigation.navigate('EditProfile', {userData: user})
+              }>
               <Ionicons name="create-outline" color={colors.white} size={32} />
             </TouchableOpacity>
           </View>
@@ -258,7 +278,7 @@ const Profile = () => {
             </View>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleLogout}>
           <View
             style={{
               display: 'flex',

@@ -1,7 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
+  Alert,
   Image,
+  Pressable,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -14,8 +16,30 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {darkColors, lightColors} from '../../constants/colors';
+import CenterModal from '../../components/CenterModal';
+import {useDispatch, useSelector} from 'react-redux';
+import {userGroups} from '../../slices/groupSlice';
 
-const GroupList = () => {
+const sampleGroups = [
+  {
+    groupName: 'ABC',
+    membersCount: 5,
+  },
+  {
+    groupName: 'Group 1',
+    membersCount: 3,
+  },
+  {
+    groupName: 'XYZ',
+    membersCount: 2,
+  },
+  {
+    groupName: 'Flat Room',
+    membersCount: 4,
+  },
+];
+
+const GroupList = ({data}) => {
   const navigation = useNavigation();
 
   const isDarkMode = useColorScheme() === 'dark';
@@ -23,7 +47,8 @@ const GroupList = () => {
   const colors = isDarkMode ? darkColors : lightColors;
 
   return (
-    <TouchableOpacity onPress={() => navigation.navigate('Group')}>
+    <TouchableOpacity
+      onPress={() => navigation.navigate('Group', {data: data})}>
       <View
         style={{
           display: 'flex',
@@ -59,7 +84,7 @@ const GroupList = () => {
                 fontWeight: 'bold',
                 fontSize: 20,
               }}>
-              Flat Room
+              {data?.groupName}
             </Text>
             <Text
               style={{
@@ -68,7 +93,7 @@ const GroupList = () => {
                 fontWeight: 'bold',
                 fontSize: 15,
               }}>
-              5 members
+              3 members
             </Text>
           </View>
         </View>
@@ -101,6 +126,34 @@ const Groups = ({navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
 
   const colors = isDarkMode ? darkColors : lightColors;
+
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const dispatch = useDispatch();
+  const {groups, loading, error, successMessage} = useSelector(
+    state => state.group,
+  );
+
+  const fetchGroups = async () => {
+    try {
+      const result = await dispatch(userGroups());
+
+      console.log('result from fetchGroups', result);
+      if (userGroups.fulfilled.match(result)) {
+        console.log('User groups fetched fulfilled!');
+        console.log('groups', groups);
+      } else {
+        Alert.alert(result.payload?.error, result.payload?.message);
+        console.log('User groups fetching failed:', result.payload);
+      }
+    } catch (err) {
+      console.log('Unexpected error:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchGroups();
+  }, []);
 
   return (
     <SafeAreaView style={{backgroundColor: colors.background, flex: 1}}>
@@ -140,28 +193,31 @@ const Groups = ({navigation}) => {
         </View>
       </View>
       <ScrollView>
-        {[1, 2, 3].map((item, index) => {
-          return <GroupList key={index} />;
+        {groups.map((item, index) => {
+          return <GroupList data={item} key={index} />;
         })}
       </ScrollView>
       <TouchableOpacity
-        activeOpacity={0.6}
-        onPress={() => navigation.navigate('ManageGroup')}>
-        <View
-          style={{
-            backgroundColor: colors.primary,
-            position: 'absolute',
-            alignItems: 'center',
-            justifyContent: 'center',
-            bottom: 10,
-            right: 10,
-            width: 60,
-            height: 60,
-            borderRadius: 50,
-          }}>
-          <Ionicons name="add" size={25} color={colors.tertiary} />
-        </View>
+        activeOpacity={0.75}
+        onPress={() => setModalVisible(true)}
+        style={{
+          backgroundColor: colors.primary,
+          position: 'absolute',
+          zIndex: 999,
+          alignItems: 'center',
+          justifyContent: 'center',
+          bottom: 25,
+          right: 15,
+          width: 75,
+          height: 75,
+          borderRadius: 50,
+        }}>
+        <Ionicons name="add" size={36} color={colors.header} />
       </TouchableOpacity>
+      <CenterModal
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+      />
     </SafeAreaView>
   );
 };

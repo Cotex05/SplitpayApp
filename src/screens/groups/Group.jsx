@@ -1,8 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
 import {useNavigation} from '@react-navigation/native';
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import {
+  Alert,
   SafeAreaView,
+  Share,
   StatusBar,
   Text,
   TouchableOpacity,
@@ -18,6 +20,9 @@ import {SceneMap, TabBar, TabView} from 'react-native-tab-view';
 import ExpensesRoute from './routes/ExpensesRoute';
 import OverviewRoute from './routes/OverviewRoute';
 import SettlementsRoute from './routes/SettementsRoute';
+import {MenuView} from '@react-native-menu/menu';
+import {useDispatch, useSelector} from 'react-redux';
+import {fetchGroupInfo, fetchGroupMembers} from '../../slices/groupInfoSlice';
 
 const renderScene = SceneMap({
   first: OverviewRoute,
@@ -31,15 +36,81 @@ const routes = [
   {key: 'third', title: 'Settlements'},
 ];
 
-const Group = ({navigation}) => {
+const Group = ({route, navigation}) => {
   // const navigation = useNavigation();
 
   const isDarkMode = useColorScheme() === 'dark';
 
   const colors = isDarkMode ? darkColors : lightColors;
 
+  const {data} = route.params;
+
   const layout = useWindowDimensions();
   const [index, setIndex] = React.useState(0);
+
+  const menuRef = useRef(null);
+
+  const handleGroupClose = () => {
+    console.log('pop menu closed!');
+  };
+
+  const handleGroupEdit = () => {};
+
+  const handleGroupInvite = async () => {
+    try {
+      const result = await Share.share({
+        message: `Invite people to this group!`,
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error) {
+      Alert.alert(error.message);
+    }
+  };
+
+  const dispatch = useDispatch();
+  const {groupData, groupMembers, loading, error, successMessage} = useSelector(
+    state => state.groupInfo,
+  );
+
+  const fetchGroupData = async () => {
+    try {
+      const result1 = await dispatch(fetchGroupInfo(data?.groupId));
+
+      console.log('result1 from fetchGroupData', result1);
+      if (fetchGroupInfo.fulfilled.match(result1)) {
+        console.log('Group info fetched fulfilled!');
+        console.log('groupData', groupData);
+      } else {
+        Alert.alert(result1.payload?.error, result1.payload?.message);
+        console.log('Group info fetching failed:', result1.payload);
+      }
+
+      const result2 = await dispatch(fetchGroupMembers(data?.groupId));
+
+      console.log('result2 from fetchGroupData', result2);
+      if (fetchGroupMembers.fulfilled.match(result2)) {
+        console.log('Group members fetched fulfilled!');
+        console.log('groupMembers', groupMembers);
+      } else {
+        Alert.alert(result2.payload?.error, result2.payload?.message);
+        console.log('Group members fetching failed:', result2.payload);
+      }
+    } catch (err) {
+      console.log('Unexpected error:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchGroupData();
+  }, []);
 
   const renderTabBar = props => {
     return (
@@ -74,17 +145,48 @@ const Group = ({navigation}) => {
                 fontWeight: 'bold',
                 textAlign: 'center',
               }}>
-              Flat Room
+              {data?.groupName}
             </Text>
           </View>
           <View>
-            <TouchableOpacity>
-              <Ionicons
-                name="ellipsis-vertical"
-                color={colors.header}
-                size={24}
-              />
-            </TouchableOpacity>
+            <MenuView
+              ref={menuRef}
+              title="Menu"
+              onPressAction={({nativeEvent}) => {
+                if (nativeEvent.event == 'invite') {
+                  handleGroupInvite();
+                } else if (nativeEvent.event == 'edit') {
+                  handleGroupEdit();
+                } else if (nativeEvent.event == 'close') {
+                  handleGroupClose();
+                }
+              }}
+              actions={[
+                {
+                  id: 'invite',
+                  title: 'Invite',
+                  titleColor: colors.text,
+                },
+                {
+                  id: 'edit',
+                  title: 'Edit group',
+                  titleColor: colors.text,
+                },
+                {
+                  id: 'close',
+                  title: 'Close',
+                  titleColor: colors.text,
+                },
+              ]}
+              shouldOpenOnLongPress={false}>
+              <TouchableOpacity>
+                <Ionicons
+                  name="ellipsis-vertical"
+                  color={colors.header}
+                  size={24}
+                />
+              </TouchableOpacity>
+            </MenuView>
           </View>
         </View>
       </View>
@@ -96,22 +198,20 @@ const Group = ({navigation}) => {
         initialLayout={{width: layout.width}}
       />
       <TouchableOpacity
-        activeOpacity={0.6}
-        onPress={() => navigation.navigate('ExpenseManager')}>
-        <View
-          style={{
-            backgroundColor: colors.primary,
-            position: 'absolute',
-            alignItems: 'center',
-            justifyContent: 'center',
-            bottom: 10,
-            right: 10,
-            width: 60,
-            height: 60,
-            borderRadius: 50,
-          }}>
-          <Ionicons name="wallet-outline" size={25} color={colors.tertiary} />
-        </View>
+        activeOpacity={0.75}
+        onPress={() => navigation.navigate('ExpenseManager')}
+        style={{
+          backgroundColor: colors.primary,
+          position: 'absolute',
+          alignItems: 'center',
+          justifyContent: 'center',
+          bottom: 20,
+          right: 15,
+          width: 75,
+          height: 75,
+          borderRadius: 50,
+        }}>
+        <Ionicons name="wallet-outline" size={36} color={colors.header} />
       </TouchableOpacity>
     </SafeAreaView>
   );

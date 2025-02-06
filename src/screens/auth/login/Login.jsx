@@ -8,8 +8,14 @@ import {
   useColorScheme,
   Alert,
   StatusBar,
+  ActivityIndicator,
 } from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {useDispatch, useSelector} from 'react-redux';
+import {userLogin} from '../../../slices/authSlices';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {showToastWithGravity} from '../../../components/native/AndroidComponents';
+import {APP_NAME} from '../../../constants/names';
 
 const LoginScreen = ({navigation}) => {
   const [username, setUsername] = useState('');
@@ -29,12 +35,43 @@ const LoginScreen = ({navigation}) => {
     borderColor: isDarkMode ? '#ddd' : Colors.darker,
   };
 
-  const handleLogin = () => {
+  const dispatch = useDispatch();
+  const {loading, error, successMessage, token} = useSelector(
+    state => state.auth,
+  );
+
+  const setAuthenticationInMemory = async userData => {
+    try {
+      const jsonValue = JSON.stringify(userData);
+      await AsyncStorage.setItem('authUser', jsonValue);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const handleLogin = async () => {
     if (username.trim().length === 0 || password.trim().length === 0) {
       Alert.alert('Invalid Login', 'Username and password are required');
       return;
     }
-    navigation.navigate('Home');
+
+    try {
+      const resultAction = await dispatch(userLogin({username, password}));
+
+      console.log('result from handleLogin', resultAction);
+      if (userLogin.fulfilled.match(resultAction)) {
+        await setAuthenticationInMemory(resultAction?.payload);
+        showToastWithGravity(`Welcome to ${APP_NAME}`);
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'MainNavigator'}], // Reset navigation after login success
+        });
+      } else {
+        console.log('Login failed:', resultAction.payload);
+      }
+    } catch (err) {
+      console.log('Unexpected error:', err);
+    }
   };
 
   return (
@@ -64,9 +101,17 @@ const LoginScreen = ({navigation}) => {
         autoCapitalize="none"
       />
 
-      <TouchableOpacity style={[styles.button]} onPress={handleLogin}>
-        <Text style={[styles.buttonText]}>Login</Text>
-      </TouchableOpacity>
+      {error ? (
+        <Text style={{color: 'red', fontSize: 20, padding: 10}}>{error}</Text>
+      ) : null}
+
+      {loading ? (
+        <ActivityIndicator size="large" color="blue" />
+      ) : (
+        <TouchableOpacity style={[styles.button]} onPress={handleLogin}>
+          <Text style={[styles.buttonText]}>Login</Text>
+        </TouchableOpacity>
+      )}
 
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
         <Text style={[styles.link]}>Don't have an account? Register here</Text>

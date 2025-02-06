@@ -15,6 +15,8 @@ import SettledTransaction from '../screens/settlement/SettledTransaction';
 import Support from '../screens/others/Support';
 import About from '../screens/others/About';
 import BalanceGraph from '../screens/expense/BalanceGraph';
+import RegisterScreen from '../screens/auth/register/Register';
+import LoginScreen from '../screens/auth/login/Login';
 
 const Stack = createNativeStackNavigator();
 
@@ -44,6 +46,8 @@ function MainNavigator() {
       <Stack.Screen name="About" component={About} />
       <Stack.Screen name="Support" component={Support} />
       <Stack.Screen name="BalanceGraph" component={BalanceGraph} />
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Register" component={RegisterScreen} />
     </Stack.Navigator>
   );
 }

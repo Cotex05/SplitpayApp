@@ -19,6 +19,16 @@ const ModalStyle = StyleSheet.create({
     alignItems: 'center',
     elevation: 5,
   },
+  centeredModalView: {
+    width: Dimensions.get('screen').width * 0.8,
+    height: 260,
+    margin: 20,
+    backgroundColor: darkColors.primary,
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    elevation: 5,
+  },
   buttonClose: {
     margin: 10,
     alignItems: 'center',

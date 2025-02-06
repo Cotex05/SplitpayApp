@@ -138,7 +138,7 @@ const BalanceGraph = ({navigation}) => {
               fontWeight: 'bold',
               textAlign: 'center',
             }}>
-            Balance Graph
+            Balance
           </Text>
           <TouchableOpacity
             onPress={() => navigation.goBack()}

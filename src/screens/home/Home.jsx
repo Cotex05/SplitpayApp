@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   Image,
   SafeAreaView,
@@ -16,6 +16,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {darkColors, lightColors} from '../../constants/colors';
 import currency from '../../constants/currency';
 import GlobalStyle from '../../styles/GlobalStyle';
+import {useDispatch, useSelector} from 'react-redux';
+import {fetchUsers} from '../../slices/userSlices';
+import {APP_NAME} from '../../constants/names';
 
 const TransactionList = () => {
   const navigation = useNavigation();
@@ -94,6 +97,16 @@ const Home = ({navigation}) => {
 
   const colors = isDarkMode ? darkColors : lightColors;
 
+  const dispatch = useDispatch();
+
+  const user = useSelector(state => state.auth.user);
+
+  useEffect(() => {
+    setTimeout(() => {
+      console.log(user);
+    }, 1000);
+  }, []);
+
   return (
     <SafeAreaView style={{backgroundColor: colors.background, flex: 1}}>
       <StatusBar barStyle={'light-content'} backgroundColor={colors.primary} />
@@ -117,7 +130,7 @@ const Home = ({navigation}) => {
               fontSize: 32,
               marginLeft: 10,
             }}>
-            Splitpay
+            {APP_NAME}
           </Text>
         </View>
         <TouchableOpacity style={{padding: 5, marginHorizontal: 10}}>
@@ -142,7 +155,7 @@ const Home = ({navigation}) => {
               </Text>
               <Text
                 style={{fontSize: 20, fontWeight: 700, color: colors.tertiary}}>
-                John Doe
+                {user?.username}
               </Text>
             </View>
             <View>
@@ -238,7 +251,7 @@ const Home = ({navigation}) => {
             fontWeight: 'bold',
             fontSize: 20,
           }}>
-          Transactions
+          Expenses
         </Text>
       </View>
       <ScrollView>

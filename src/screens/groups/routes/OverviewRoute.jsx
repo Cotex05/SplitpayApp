@@ -5,8 +5,10 @@ import {
   Alert,
   Dimensions,
   Image,
+  RefreshControl,
   ScrollView,
   Text,
+  ToastAndroid,
   TouchableOpacity,
   useColorScheme,
   View,
@@ -14,6 +16,7 @@ import {
 import {darkColors, lightColors} from '../../../constants/colors';
 import currency from '../../../constants/currency';
 import GlobalStyle from '../../../styles/GlobalStyle';
+import {showToastWithGravity} from '../../../components/native/AndroidComponents';
 
 const sampleMembers = [
   {
@@ -126,8 +129,21 @@ const OverviewRoute = () => {
 
   const colors = isDarkMode ? darkColors : lightColors;
 
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+      showToastWithGravity('Refreshed!');
+    }, 2000);
+  }, []);
+
   return (
-    <View>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }>
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() => navigation.navigate('BalanceGraph')}>
@@ -204,7 +220,7 @@ const OverviewRoute = () => {
           return <MemberList data={item} key={index} />;
         })}
       </ScrollView>
-    </View>
+    </ScrollView>
   );
 };
 
