@@ -17,7 +17,6 @@ import {darkColors, lightColors} from '../../constants/colors';
 import currency from '../../constants/currency';
 import GlobalStyle from '../../styles/GlobalStyle';
 import {useDispatch, useSelector} from 'react-redux';
-import {fetchUsers} from '../../slices/userSlices';
 import {APP_NAME} from '../../constants/names';
 
 const TransactionList = () => {
@@ -178,14 +177,14 @@ const Home = ({navigation}) => {
             </View>
           </View>
         </View>
-        <View style={[{marginHorizontal: 20}, GlobalStyle.justifyBetweenRow]}>
+        <View style={[{marginHorizontal: 10}, GlobalStyle.justifyBetweenRow]}>
           <View
             style={{
               backgroundColor: 'rgba(0,0,0,0.2)',
-              height: 150,
-              width: 150,
+              height: 140,
+              width: 140,
               margin: 10,
-              borderWidth: 10,
+              borderWidth: 5,
               paddingTop: 10,
               borderColor: colors.tertiary,
               borderRadius: '50%',

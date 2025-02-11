@@ -1,9 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
+  Alert,
   Dimensions,
   Keyboard,
-  Pressable,
   SafeAreaView,
   StatusBar,
   Text,
@@ -13,35 +14,103 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
+import DatePicker from 'react-native-date-picker';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {darkColors, lightColors} from '../../constants/colors';
-import GlobalStyle from '../../styles/GlobalStyle';
-import DatePicker from 'react-native-date-picker';
+import {useDispatch, useSelector} from 'react-redux';
 import {AccentActionButton, MutedActionButton} from '../../components/Buttons';
+import {showToastWithGravity} from '../../components/native/AndroidComponents';
+import {darkColors, lightColors} from '../../constants/colors';
+import {saveExpense} from '../../slices/expenseManagerSlice';
+import {
+  fetchExpenseCashFlow,
+  fetchGroupExpenses,
+} from '../../slices/expenseSlice';
+import GlobalStyle from '../../styles/GlobalStyle';
+import {fetchUserGroupBalanceGraph} from '../../slices/balanceSlice';
 
-const ExpenseManager = ({navigation}) => {
+const ExpenseManager = ({route, navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
 
   const colors = isDarkMode ? darkColors : lightColors;
 
+  const {data} = route.params;
+
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
+  const [sharedMembers, setSharedMembers] = useState([]);
+  const [date, setDate] = useState(new Date());
 
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState([]);
-  const [items, setItems] = useState([
-    {label: 'Mark', value: '@mark'},
-    {label: 'Tyson', value: '@tyson'},
-    {label: 'Mike Guth', value: '@mike_guth'},
-  ]);
+  const [selectedMembers, setSelectedMembers] = useState([]);
 
-  const [date, setDate] = useState(new Date());
   const [openDate, setOpenDate] = useState(false);
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
+
+  const dispatch = useDispatch();
+
+  const {groupMembers} = useSelector(state => state.groupInfo);
+  const {response, expenseSaving, expenseError, expenseSuccessMessage} =
+    useSelector(state => state.expenseManager);
+
+  const handleAddExpense = async () => {
+    if (
+      amount.trim().length < 1 ||
+      Math.round(amount) == 0 ||
+      title.trim().length < 3
+    ) {
+      Alert.alert(
+        'Invalid expense!',
+        'Please enter a valid expense title and amount',
+      );
+      return;
+    }
+
+    try {
+      const expenseRequest = {
+        groupId: data?.groupId,
+        expenseData: {
+          amount: parseFloat(amount),
+          description: title,
+          sharedUsers: selectedMembers,
+          createdAt: date.toISOString(),
+        },
+      };
+      console.log(expenseRequest);
+      const resultAction = await dispatch(saveExpense(expenseRequest));
+
+      console.log('Result from handleAddExpense', resultAction);
+      if (saveExpense.fulfilled.match(resultAction)) {
+        showToastWithGravity(`Expense Saved!`);
+        dispatch(fetchGroupExpenses(data?.groupId));
+        dispatch(fetchUserGroupBalanceGraph(data?.groupId));
+        dispatch(fetchExpenseCashFlow(data?.groupId));
+        navigation.goBack();
+      } else {
+        console.log('Failed to save expense:', resultAction.payload);
+      }
+    } catch (err) {
+      console.log('Unexpected error:', err);
+    }
+  };
+
+  const populateMembersToSplit = () => {
+    const people = [];
+    groupMembers.map(member => {
+      people.push({
+        label: member?.username,
+        value: member?.userId,
+      });
+    });
+    setSharedMembers(people);
+  };
+
+  useEffect(() => {
+    populateMembersToSplit();
+  }, []);
 
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
@@ -95,19 +164,20 @@ const ExpenseManager = ({navigation}) => {
               placeholderTextColor={colors.muted}
               onChangeText={setTitle}
               value={title}
+              maxLength={40}
             />
           </View>
         </View>
-        <View style={{backgroundColor: colors.background}}>
+        <View
+          style={{backgroundColor: colors.background, marginHorizontal: 20}}>
           <View
             style={{
-              paddingHorizontal: 10,
-              marginVertical: 10,
+              marginVertical: 16,
             }}>
             <TextInput
               style={{
                 height: 50,
-                width: Dimensions.get('screen').width - 20,
+                width: Dimensions.get('screen').width * 0.9,
                 borderRadius: 10,
                 borderWidth: 2,
                 padding: 10,
@@ -118,8 +188,9 @@ const ExpenseManager = ({navigation}) => {
               placeholderTextColor={colors.muted}
               onChangeText={setAmount}
               placeholder="Amount"
-              keyboardType="numeric"
+              keyboardType="number-pad"
               value={amount}
+              maxLength={10}
             />
             <Text style={{color: colors.muted, padding: 2}}>
               This amount will be splitted equally including you
@@ -127,7 +198,7 @@ const ExpenseManager = ({navigation}) => {
           </View>
           <View
             style={{
-              paddingHorizontal: 10,
+              width: Dimensions.get('screen').width * 0.9,
             }}>
             <Text
               style={{
@@ -152,11 +223,11 @@ const ExpenseManager = ({navigation}) => {
               }}
               placeholder="Select people"
               open={open}
-              value={value}
-              items={items}
+              value={selectedMembers}
+              items={sharedMembers}
               setOpen={setOpen}
-              setValue={setValue}
-              setItems={setItems}
+              setValue={setSelectedMembers}
+              setItems={setSharedMembers}
               theme={isDarkMode ? 'DARK' : 'LIGHT'}
               multiple={true}
               mode="BADGE"
@@ -168,11 +239,11 @@ const ExpenseManager = ({navigation}) => {
           </View>
           <View
             style={{
-              padding: 10,
+              width: Dimensions.get('screen').width * 0.9,
             }}>
             <Text
               style={{
-                padding: 5,
+                padding: 10,
                 color: colors.text,
                 fontSize: 20,
                 fontWeight: 600,
@@ -184,7 +255,6 @@ const ExpenseManager = ({navigation}) => {
               onPress={() => setOpenDate(true)}
               style={{
                 height: 50,
-                width: Dimensions.get('screen').width - 20,
                 borderRadius: 10,
                 borderWidth: 2,
                 padding: 10,
@@ -204,9 +274,10 @@ const ExpenseManager = ({navigation}) => {
             open={openDate}
             date={date}
             mode="date"
-            onConfirm={date => {
+            maximumDate={new Date()}
+            onConfirm={selectedDate => {
               setOpenDate(false);
-              setDate(date);
+              setDate(selectedDate);
             }}
             onCancel={() => {
               setOpenDate(false);
@@ -227,7 +298,8 @@ const ExpenseManager = ({navigation}) => {
           />
           <AccentActionButton
             title="Save"
-            onPress={() => navigation.goBack()}
+            loading={expenseSaving}
+            onPress={handleAddExpense}
           />
         </View>
       </SafeAreaView>

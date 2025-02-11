@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import {useNavigation} from '@react-navigation/native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
+  ActivityIndicator,
   Alert,
   Dimensions,
   Image,
@@ -17,6 +18,10 @@ import {darkColors, lightColors} from '../../../constants/colors';
 import currency from '../../../constants/currency';
 import GlobalStyle from '../../../styles/GlobalStyle';
 import {showToastWithGravity} from '../../../components/native/AndroidComponents';
+import {useDispatch, useSelector} from 'react-redux';
+import {fetchExpenseCashFlow} from '../../../slices/expenseSlice';
+import {fetchGroupMembers} from '../../../slices/groupInfoSlice';
+import {fetchUserGroupBalanceGraph} from '../../../slices/balanceSlice';
 
 const sampleMembers = [
   {
@@ -39,7 +44,7 @@ const sampleMembers = [
   },
 ];
 
-const MemberList = ({data}) => {
+const MemberList = ({data, cashFlow, navigationData}) => {
   const navigation = useNavigation();
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -47,13 +52,14 @@ const MemberList = ({data}) => {
 
   const handleMemberPress = () => {
     const title = 'Balance';
-    const oweMessage = `You owe ${currency.symbol}${data.amount} to ${data.name}`;
-    const message = `${data.name} owe you ${currency.symbol}${data.amount}`;
-    if (data.owed) {
-      Alert.alert(title, oweMessage);
+    const oweMessage = `You owe ${currency.symbol}${data?.amount} to ${data?.payee?.username}`;
+    const message = `${data?.payer?.username} owe you ${currency.symbol}${data?.amount}`;
+    if (cashFlow == 'OUT') {
+      showToastWithGravity(oweMessage);
     } else {
-      Alert.alert(title, message);
+      showToastWithGravity(message);
     }
+    navigation.navigate('BalanceGraph', {data: navigationData});
   };
 
   return (
@@ -93,7 +99,9 @@ const MemberList = ({data}) => {
                 fontWeight: 'bold',
                 fontSize: 18,
               }}>
-              {data.name}
+              {cashFlow == 'OUT'
+                ? data?.payee?.username
+                : data?.payer?.username}
             </Text>
             <Text
               style={{
@@ -102,19 +110,22 @@ const MemberList = ({data}) => {
                 fontWeight: 'bold',
                 fontSize: 15,
               }}>
-              @{data.username}
+              @
+              {cashFlow == 'OUT'
+                ? data?.payee?.username
+                : data?.payer?.username}
             </Text>
           </View>
         </View>
         <View style={GlobalStyle.justifyCenterRow}>
           <Text
             style={{
-              color: data.owed ? colors.red : colors.green,
+              color: cashFlow == 'OUT' ? colors.red : colors.green,
               fontWeight: 'bold',
               fontSize: 20,
             }}>
-            {data.owed ? '-' : '+'} {currency.symbol}
-            {data.amount}
+            {cashFlow == 'OUT' ? '-' : '+'} {currency.symbol}
+            {data?.amount}
           </Text>
         </View>
       </View>
@@ -122,7 +133,7 @@ const MemberList = ({data}) => {
   );
 };
 
-const OverviewRoute = () => {
+const OverviewRoute = ({data}) => {
   const navigation = useNavigation();
 
   const isDarkMode = useColorScheme() === 'dark';
@@ -131,13 +142,70 @@ const OverviewRoute = () => {
 
   const [refreshing, setRefreshing] = React.useState(false);
 
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-      showToastWithGravity('Refreshed!');
-    }, 2000);
+    await getExpenseCashFlow();
+    await getUserGroupBalanceGraph();
+    setRefreshing(false);
   }, []);
+
+  const dispatch = useDispatch();
+  const {groupData, groupMembers, loading, error, successMessage} = useSelector(
+    state => state.groupInfo,
+  );
+
+  const {cashflow, expenseLoading, expenseError, expenseSuccessMessage} =
+    useSelector(state => state.expense);
+
+  const {balanceGraph, balanceLoading, balanceError, balanceSuccessMessage} =
+    useSelector(state => state.balance);
+
+  const getUserGroupBalanceGraph = async () => {
+    try {
+      const result = await dispatch(fetchUserGroupBalanceGraph(data?.groupId));
+
+      console.log('Result from getUserGroupBalanceGraph', result);
+      if (fetchUserGroupBalanceGraph.fulfilled.match(result)) {
+        console.log('Group balanceGraph fetched fulfilled!');
+        console.log('BalanceGraph ', balanceGraph);
+      } else {
+        Alert.alert(result.payload?.error, result.payload?.message);
+        console.log('BalanceGraph fetching failed:', result.payload);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getExpenseCashFlow = async () => {
+    try {
+      const result = await dispatch(fetchExpenseCashFlow(data?.groupId));
+
+      console.log('result from getExpenseCashFlow', result);
+      if (fetchExpenseCashFlow.fulfilled.match(result)) {
+        console.log('Expense cashflow fetched fulfilled!');
+        console.log('cashflow ', cashflow);
+      } else {
+        Alert.alert(result.payload?.error, result.payload?.message);
+        console.log('Expense cashflow fetching failed:', result.payload);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getExpenseCashFlow();
+    getUserGroupBalanceGraph();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={{padding: 12}}>
+        <ActivityIndicator size="large" color={colors.tertiary} />
+      </View>
+    );
+  }
 
   return (
     <ScrollView
@@ -146,7 +214,7 @@ const OverviewRoute = () => {
       }>
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => navigation.navigate('BalanceGraph')}>
+        onPress={() => navigation.navigate('BalanceGraph', {data: data})}>
         <View
           style={{
             height: 100,
@@ -159,7 +227,7 @@ const OverviewRoute = () => {
           <View
             style={{
               backgroundColor: colors.green,
-              flex: 0.7,
+              flex: 0.5,
               borderTopLeftRadius: 10,
               borderBottomLeftRadius: 10,
               display: 'flex',
@@ -173,13 +241,14 @@ const OverviewRoute = () => {
                 fontWeight: 'bold',
                 fontSize: 18,
               }}>
-              + {currency.symbol}100
+              + {currency.symbol}
+              {cashflow?.cashIn}
             </Text>
           </View>
           <View
             style={{
               backgroundColor: colors.red,
-              flex: 0.3,
+              flex: 0.5,
               borderTopEndRadius: 10,
               borderBottomEndRadius: 10,
               display: 'flex',
@@ -194,7 +263,8 @@ const OverviewRoute = () => {
                 fontWeight: 'bold',
                 fontSize: 18,
               }}>
-              - {currency.symbol}25
+              - {currency.symbol}
+              {cashflow?.cashOut}
             </Text>
           </View>
         </View>
@@ -212,12 +282,29 @@ const OverviewRoute = () => {
             fontWeight: 'bold',
             fontSize: 20,
           }}>
-          Group Members
+          Net Balance
         </Text>
       </View>
       <ScrollView>
-        {sampleMembers.map((item, index) => {
-          return <MemberList data={item} key={index} />;
+        {balanceGraph?.toSend.map((item, index) => {
+          return (
+            <MemberList
+              data={item}
+              key={index}
+              cashFlow="OUT"
+              navigationData={data}
+            />
+          );
+        })}
+        {balanceGraph?.toReceive.map((item, index) => {
+          return (
+            <MemberList
+              data={item}
+              key={index}
+              cashFlow="IN"
+              navigationData={data}
+            />
+          );
         })}
       </ScrollView>
     </ScrollView>

@@ -48,6 +48,7 @@ const GroupList = ({data}) => {
 
   return (
     <TouchableOpacity
+      activeOpacity={0.75}
       onPress={() => navigation.navigate('Group', {data: data})}>
       <View
         style={{

@@ -1,21 +1,21 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useState} from 'react';
 import {
-  View,
+  ActivityIndicator,
+  Alert,
+  StatusBar,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   useColorScheme,
-  Alert,
-  StatusBar,
-  ActivityIndicator,
+  View,
 } from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {useDispatch, useSelector} from 'react-redux';
-import {userLogin} from '../../../slices/authSlices';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {showToastWithGravity} from '../../../components/native/AndroidComponents';
 import {APP_NAME} from '../../../constants/names';
+import {userLogin} from '../../../slices/authSlices';
 
 const LoginScreen = ({navigation}) => {
   const [username, setUsername] = useState('');

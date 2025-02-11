@@ -1,4 +1,4 @@
-import {View, Text, Pressable} from 'react-native';
+import {View, Text, Pressable, ActivityIndicator} from 'react-native';
 import React from 'react';
 import ButtonStyle from '../styles/ButtonStyle';
 import {darkColors} from '../constants/colors';
@@ -41,13 +41,20 @@ const MutedActionButton = ({title, onPress}) => {
   );
 };
 
-const AccentActionButton = ({title, onPress}) => {
+const AccentActionButton = ({title, onPress, loading}) => {
   return (
     <View>
-      <Pressable style={ButtonStyle.accentActionButton} onPress={onPress}>
-        <Text style={{color: colors.white, fontWeight: 600, fontSize: 20}}>
-          {title}
-        </Text>
+      <Pressable
+        style={ButtonStyle.accentActionButton}
+        onPress={onPress}
+        disabled={loading}>
+        {loading ? (
+          <ActivityIndicator size="large" color={colors.white} />
+        ) : (
+          <Text style={{color: colors.white, fontWeight: 600, fontSize: 20}}>
+            {title}
+          </Text>
+        )}
       </Pressable>
     </View>
   );

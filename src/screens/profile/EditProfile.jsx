@@ -9,11 +9,13 @@ import {
   TouchableOpacity,
   Image,
   TextInput,
+  ScrollView,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {darkColors, lightColors} from '../../constants/colors';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
+import {AccentActionButton} from '../../components/Buttons';
 
 const EditProfile = ({route, navigation}) => {
   const [name, setName] = useState('');
@@ -95,129 +97,105 @@ const EditProfile = ({route, navigation}) => {
           </View>
         </View>
       </View>
-      <View
-        style={{
-          margin: 10,
-          padding: 10,
-        }}>
-        <Text
+      <ScrollView>
+        <View
           style={{
-            color: colors.dark,
-            fontSize: 25,
-            fontWeight: 600,
-          }}>
-          Details
-        </Text>
-      </View>
-      <View
-        style={{
-          display: 'flex',
-          padding: 5,
-          marginHorizontal: 20,
-          alignItems: 'center',
-          justifyContent: 'center',
-          maxWidth: Dimensions.get('window').width,
-        }}>
-        <TextInput
-          style={{
-            height: 50,
-            margin: 12,
-            width: Dimensions.get('screen').width - 40,
-            borderRadius: 10,
-            borderWidth: 2,
-            padding: 10,
-            borderColor: colors.muted,
-            color: colors.text,
-            fontSize: 18,
-            fontWeight: 500,
-          }}
-          placeholderTextColor={colors.muted}
-          onChangeText={setName}
-          placeholder="Name"
-          value={name}
-        />
-        <TextInput
-          style={{
-            height: 50,
-            margin: 12,
-            width: Dimensions.get('screen').width - 40,
-            borderRadius: 10,
-            borderWidth: 2,
-            padding: 10,
-            borderColor: colors.muted,
-            color: colors.muted,
-            fontSize: 18,
-            fontWeight: 500,
-          }}
-          placeholderTextColor={colors.muted}
-          onChangeText={setUsername}
-          placeholder="Username"
-          value={`@${username}`}
-          editable={false}
-          selectTextOnFocus={false}
-        />
-        <TextInput
-          style={{
-            height: 50,
-            margin: 12,
-            width: Dimensions.get('screen').width - 40,
-            borderRadius: 10,
-            borderWidth: 2,
-            padding: 10,
-            borderColor: colors.muted,
-            color: colors.text,
-            fontSize: 18,
-            fontWeight: 500,
-          }}
-          placeholderTextColor={colors.muted}
-          onChangeText={setEmail}
-          placeholder="Email"
-          value={email}
-          keyboardType="email-address"
-        />
-        <TextInput
-          style={{
-            height: 50,
-            margin: 12,
-            width: Dimensions.get('screen').width - 40,
-            borderRadius: 10,
-            borderWidth: 2,
-            padding: 10,
-            borderColor: colors.muted,
-            color: colors.text,
-            fontSize: 18,
-            fontWeight: 500,
-          }}
-          placeholderTextColor={colors.muted}
-          onChangeText={setPhoneNumber}
-          placeholder="Phone Number"
-          value={phoneNumber}
-          keyboardType="number-pad"
-        />
-      </View>
-      <View
-        style={{
-          marginVertical: 100,
-          display: 'flex',
-          alignItems: 'center',
-        }}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          style={{
-            width: 120,
-            height: 50,
+            display: 'flex',
+            padding: 5,
+            marginHorizontal: 20,
             alignItems: 'center',
             justifyContent: 'center',
-            borderWidth: 1,
-            borderColor: colors.secondary,
-            borderRadius: 15,
+            maxWidth: Dimensions.get('window').width,
           }}>
-          <Text
-            style={{color: colors.tertiary, fontWeight: 'bold', fontSize: 25}}>
-            Save
-          </Text>
-        </TouchableOpacity>
-      </View>
+          <TextInput
+            style={{
+              height: 50,
+              margin: 12,
+              width: Dimensions.get('screen').width - 40,
+              borderRadius: 10,
+              borderWidth: 2,
+              padding: 10,
+              borderColor: colors.muted,
+              color: colors.text,
+              fontSize: 18,
+              fontWeight: 500,
+            }}
+            placeholderTextColor={colors.muted}
+            onChangeText={setName}
+            placeholder="Name"
+            value={name}
+          />
+          <TextInput
+            style={{
+              height: 50,
+              margin: 12,
+              width: Dimensions.get('screen').width - 40,
+              borderRadius: 10,
+              borderWidth: 2,
+              padding: 10,
+              borderColor: colors.muted,
+              color: colors.muted,
+              fontSize: 18,
+              fontWeight: 500,
+            }}
+            placeholderTextColor={colors.muted}
+            onChangeText={setUsername}
+            placeholder="Username"
+            value={`@${username}`}
+            editable={false}
+            selectTextOnFocus={false}
+          />
+          <TextInput
+            style={{
+              height: 50,
+              margin: 12,
+              width: Dimensions.get('screen').width - 40,
+              borderRadius: 10,
+              borderWidth: 2,
+              padding: 10,
+              borderColor: colors.muted,
+              color: colors.text,
+              fontSize: 18,
+              fontWeight: 500,
+            }}
+            placeholderTextColor={colors.muted}
+            onChangeText={setEmail}
+            placeholder="Email"
+            value={email}
+            keyboardType="email-address"
+          />
+          <TextInput
+            style={{
+              height: 50,
+              margin: 12,
+              width: Dimensions.get('screen').width - 40,
+              borderRadius: 10,
+              borderWidth: 2,
+              padding: 10,
+              borderColor: colors.muted,
+              color: colors.text,
+              fontSize: 18,
+              fontWeight: 500,
+            }}
+            placeholderTextColor={colors.muted}
+            onChangeText={setPhoneNumber}
+            placeholder="Phone Number"
+            value={phoneNumber}
+            keyboardType="number-pad"
+          />
+        </View>
+        <View
+          style={{
+            marginVertical: 50,
+            display: 'flex',
+            alignItems: 'center',
+          }}>
+          <AccentActionButton
+            title="Save"
+            onPress={() => navigation.goBack()}
+          />
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

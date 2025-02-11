@@ -22,9 +22,9 @@ const BottomModal = ({modalVisible, setModalVisible, data}) => {
               Pay{'  '}
               <Text style={{color: colors.tertiary, fontSize: 30}}>
                 {currency.symbol}
-                {data.amount}{' '}
+                {data?.amount}{' '}
               </Text>{' '}
-              to {data.payee}
+              to {data?.payee?.username}
             </Text>
           </View>
           <SuccessActionButton

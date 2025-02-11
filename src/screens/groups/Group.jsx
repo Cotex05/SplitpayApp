@@ -2,6 +2,7 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useRef} from 'react';
 import {
+  ActivityIndicator,
   Alert,
   SafeAreaView,
   Share,
@@ -23,12 +24,6 @@ import SettlementsRoute from './routes/SettementsRoute';
 import {MenuView} from '@react-native-menu/menu';
 import {useDispatch, useSelector} from 'react-redux';
 import {fetchGroupInfo, fetchGroupMembers} from '../../slices/groupInfoSlice';
-
-const renderScene = SceneMap({
-  first: OverviewRoute,
-  second: ExpensesRoute,
-  third: SettlementsRoute,
-});
 
 const routes = [
   {key: 'first', title: 'Overview'},
@@ -122,6 +117,20 @@ const Group = ({route, navigation}) => {
     );
   };
 
+  // Dynamic renderScene function
+  const renderScene = ({route}) => {
+    switch (route.key) {
+      case 'first':
+        return <OverviewRoute data={data} />;
+      case 'second':
+        return <ExpensesRoute data={data} />;
+      case 'third':
+        return <SettlementsRoute />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.background}}>
       <StatusBar barStyle={'light-content'} backgroundColor={colors.primary} />
@@ -190,16 +199,22 @@ const Group = ({route, navigation}) => {
           </View>
         </View>
       </View>
-      <TabView
-        renderTabBar={renderTabBar}
-        navigationState={{index, routes}}
-        renderScene={renderScene}
-        onIndexChange={setIndex}
-        initialLayout={{width: layout.width}}
-      />
+      {loading ? (
+        <View style={{padding: 12}}>
+          <ActivityIndicator size="large" color={colors.tertiary} />
+        </View>
+      ) : (
+        <TabView
+          renderTabBar={renderTabBar}
+          navigationState={{index, routes}}
+          renderScene={renderScene}
+          onIndexChange={setIndex}
+          initialLayout={{width: layout.width}}
+        />
+      )}
       <TouchableOpacity
         activeOpacity={0.75}
-        onPress={() => navigation.navigate('ExpenseManager')}
+        onPress={() => navigation.navigate('ExpenseManager', {data: data})}
         style={{
           backgroundColor: colors.primary,
           position: 'absolute',

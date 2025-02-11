@@ -1,13 +1,12 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-import axios from 'axios';
-import {API_BASE_URL} from '@env';
+import AxiosInstance from '../api/AxiosInstance';
 
 // Async Thunk for Group Info (GET Request)
 export const fetchGroupInfo = createAsyncThunk(
   'groups/info',
   async (groupId, {rejectWithValue}) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/groups/${groupId}`);
+      const response = await AxiosInstance.get(`/groups/${groupId}`);
       console.log('Group info response: ', response);
       return response.data;
     } catch (error) {
@@ -24,8 +23,8 @@ export const fetchGroupMembers = createAsyncThunk(
   'groups/members',
   async (groupId, {rejectWithValue}) => {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/groups/${groupId}/members/all`,
+      const response = await AxiosInstance.get(
+        `/groups/${groupId}/members/all`,
       );
       console.log('Group members response: ', response);
       return response.data;
@@ -38,7 +37,7 @@ export const fetchGroupMembers = createAsyncThunk(
   },
 );
 
-// Group Info Slice
+export // Group Info Slice
 const groupInfoSlice = createSlice({
   name: 'groupInfo',
   initialState: {

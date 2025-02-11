@@ -1,16 +1,22 @@
 /* eslint-disable react-native/no-inline-styles */
 import {useNavigation} from '@react-navigation/native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
+  ActivityIndicator,
+  Alert,
+  RefreshControl,
   ScrollView,
   Text,
   TouchableOpacity,
   useColorScheme,
   View,
 } from 'react-native';
-import {darkColors, lightColors} from '../../../constants/colors';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useDispatch, useSelector} from 'react-redux';
+import {showToastWithGravity} from '../../../components/native/AndroidComponents';
+import {darkColors, lightColors} from '../../../constants/colors';
 import currency from '../../../constants/currency';
+import {fetchGroupExpenses} from '../../../slices/expenseSlice';
 
 const sampleExpenses = [
   {
@@ -100,7 +106,7 @@ const ExpenseList = ({data}) => {
                 fontWeight: 'bold',
                 fontSize: 18,
               }}>
-              {data.title}
+              {data?.description}
             </Text>
             <Text
               style={{
@@ -109,7 +115,7 @@ const ExpenseList = ({data}) => {
                 fontWeight: 'bold',
                 fontSize: 15,
               }}>
-              {data.paidBy}
+              {data?.paidBy?.username}
             </Text>
           </View>
         </View>
@@ -121,7 +127,7 @@ const ExpenseList = ({data}) => {
               fontSize: 20,
             }}>
             {currency.symbol}
-            {data.amount}
+            {data?.amount}
           </Text>
           <Text
             style={{
@@ -131,7 +137,7 @@ const ExpenseList = ({data}) => {
               paddingVertical: 5,
               fontSize: 12,
             }}>
-            {data.date}
+            {new Date(data?.createdAt).toLocaleDateString()}
           </Text>
         </View>
       </View>
@@ -139,37 +145,84 @@ const ExpenseList = ({data}) => {
   );
 };
 
-const ExpensesRoute = () => {
+const ExpensesRoute = ({data}) => {
   const navigation = useNavigation();
 
   const isDarkMode = useColorScheme() === 'dark';
 
   const colors = isDarkMode ? darkColors : lightColors;
 
-  return (
-    <View>
-      <View
-        display="flex"
-        flexDirection="row"
-        justifyContent="space-between"
-        style={{borderBottomWidth: 2, borderBottomColor: colors.muted}}>
-        <Text
-          style={{
-            display: 'flex',
-            color: colors.text,
-            padding: 10,
-            fontWeight: 'bold',
-            fontSize: 20,
-          }}>
-          Expenses
-        </Text>
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    await getGroupExpenses();
+    setRefreshing(false);
+    showToastWithGravity('Refreshed!');
+  }, []);
+
+  const dispatch = useDispatch();
+  const {expenses, expenseLoading, expenseError, expenseSuccessMessage} =
+    useSelector(state => state.expense);
+
+  const getGroupExpenses = async () => {
+    try {
+      const result = await dispatch(fetchGroupExpenses(data?.groupId));
+
+      console.log('result from getGroupExpenses', result);
+      if (fetchGroupExpenses.fulfilled.match(result)) {
+        console.log('Group Expenses fetched fulfilled!');
+        console.log('Expenses ', expenses);
+      } else {
+        Alert.alert(result.payload?.error, result.payload?.message);
+        console.log('Group expenses fetching failed:', result.payload);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getGroupExpenses();
+  }, []);
+
+  if (expenseLoading) {
+    return (
+      <View style={{padding: 12}}>
+        <ActivityIndicator size="large" color={colors.tertiary} />
       </View>
-      <ScrollView>
-        {sampleExpenses.map((item, index) => {
-          return <ExpenseList data={item} key={index} />;
-        })}
-      </ScrollView>
-    </View>
+    );
+  }
+
+  return (
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }>
+      <View>
+        <View
+          display="flex"
+          flexDirection="row"
+          justifyContent="space-between"
+          style={{borderBottomWidth: 2, borderBottomColor: colors.muted}}>
+          <Text
+            style={{
+              display: 'flex',
+              color: colors.text,
+              padding: 10,
+              fontWeight: 'bold',
+              fontSize: 20,
+            }}>
+            Expenses
+          </Text>
+        </View>
+        <ScrollView>
+          {expenses.map((item, index) => {
+            return <ExpenseList data={item} key={index} />;
+          })}
+        </ScrollView>
+      </View>
+    </ScrollView>
   );
 };
 

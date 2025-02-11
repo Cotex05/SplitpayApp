@@ -1,13 +1,12 @@
-import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-import axios from 'axios';
-import {API_BASE_URL} from '@env';
+import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import AxiosInstance from '../api/AxiosInstance';
 
 // Async Thunk for User Group (GET Request)
 export const userGroups = createAsyncThunk(
   'groups/userGroups',
   async (_, {rejectWithValue}) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/groups/user`);
+      const response = await AxiosInstance.get(`/groups/user`);
       console.log('User Groups response: ', response);
       return response.data;
     } catch (error) {

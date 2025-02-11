@@ -1,18 +1,14 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-import axios from 'axios';
-import {API_BASE_URL} from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {showToastWithGravity} from '../components/native/AndroidComponents';
+import AxiosInstance from '../api/AxiosInstance';
 
 // Async Thunk for User Sign Up (POST Request)
 export const userSignUp = createAsyncThunk(
   'auth/userSignUp',
   async (userData, {rejectWithValue}) => {
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/auth/signup`,
-        userData,
-      );
+      const response = await AxiosInstance.post(`/auth/signup`, userData);
       console.log('Signup response: ', response);
       return response.data; // API response (success message or user data)
     } catch (error) {
@@ -29,10 +25,7 @@ export const userLogin = createAsyncThunk(
   'auth/userLogin',
   async (loginData, {rejectWithValue}) => {
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/auth/signin`,
-        loginData,
-      );
+      const response = await AxiosInstance.post(`/auth/signin`, loginData);
       console.log('Login response: ', response);
       return response.data; // Returns user data (e.g., token, user details)
     } catch (error) {

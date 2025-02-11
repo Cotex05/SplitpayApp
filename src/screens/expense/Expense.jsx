@@ -7,19 +7,29 @@ import {
   StatusBar,
   Dimensions,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
-import React from 'react';
+import React, {useRef} from 'react';
 import {darkColors, lightColors} from '../../constants/colors';
 import GlobalStyle from '../../styles/GlobalStyle';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
 import currency from '../../constants/currency';
 import {MutedActionButton} from '../../components/Buttons';
+import {MenuView} from '@react-native-menu/menu';
+import {useDispatch, useSelector} from 'react-redux';
+import {removeExpense} from '../../slices/expenseManagerSlice';
+import {showToastWithGravity} from '../../components/native/AndroidComponents';
+import {
+  fetchExpenseCashFlow,
+  fetchGroupExpenses,
+} from '../../slices/expenseSlice';
 
 const ExpenseList = ({title, value}) => {
   const isDarkMode = useColorScheme() === 'dark';
 
   const colors = isDarkMode ? darkColors : lightColors;
+
   return (
     <View
       style={{
@@ -48,10 +58,51 @@ const Expense = ({route, navigation}) => {
 
   const {data} = route.params;
 
+  const menuRef = useRef(null);
+
+  const handleMenuClose = () => {
+    console.log('pop menu closed!');
+  };
+
+  const dispatch = useDispatch();
+  const {response, expenseRemoving, expenseError, expenseSuccessMessage} =
+    useSelector(state => state.expenseManager);
+
+  const handleExpenseDelete = async () => {
+    try {
+      const ids = {
+        expenseId: data?.expenseId,
+        groupId: data?.group?.groupId,
+      };
+      console.log(ids);
+      const result = await dispatch(removeExpense(ids));
+
+      console.log('Result from handleExpenseDelete', result);
+      if (removeExpense.fulfilled.match(result)) {
+        console.log('Expense removed fulfilled!');
+        dispatch(fetchGroupExpenses(ids?.groupId));
+        dispatch(fetchExpenseCashFlow(ids?.groupId));
+        console.log('Removed expense ', response);
+        showToastWithGravity('Expense removed!');
+        navigation.goBack();
+      } else {
+        Alert.alert(
+          result.payload?.error
+            ? result.payload?.error
+            : "Can't remove expense!",
+          result.payload?.message,
+        );
+        console.log('Expense removing failed:', result.payload);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const sampleDetails = [
     {
       title: 'Amount',
-      value: `${currency.symbol} ${data.amount}`,
+      value: `${currency.symbol} ${data?.amount}`,
     },
     {
       title: 'Currency',
@@ -60,17 +111,17 @@ const Expense = ({route, navigation}) => {
 
     {
       title: 'Paid By',
-      value: data.paidBy,
+      value: data?.paidBy?.username,
     },
 
     {
       title: 'For',
-      value: data.paidFor,
+      value: data?.shares.length,
     },
 
     {
       title: 'Created on',
-      value: data.date,
+      value: new Date(data?.createdAt).toLocaleDateString(),
     },
   ];
 
@@ -101,13 +152,37 @@ const Expense = ({route, navigation}) => {
             </Text>
           </View>
           <View>
-            <TouchableOpacity>
-              <Ionicons
-                name="ellipsis-vertical"
-                color={colors.header}
-                size={24}
-              />
-            </TouchableOpacity>
+            <MenuView
+              ref={menuRef}
+              title="Menu"
+              onPressAction={({nativeEvent}) => {
+                if (nativeEvent.event == 'delete') {
+                  handleExpenseDelete();
+                } else if (nativeEvent.event == 'close') {
+                  handleMenuClose();
+                }
+              }}
+              actions={[
+                {
+                  id: 'delete',
+                  title: 'Delete expense',
+                  titleColor: colors.text,
+                },
+                {
+                  id: 'close',
+                  title: 'Close',
+                  titleColor: colors.text,
+                },
+              ]}
+              shouldOpenOnLongPress={false}>
+              <TouchableOpacity>
+                <Ionicons
+                  name="ellipsis-vertical"
+                  color={colors.header}
+                  size={24}
+                />
+              </TouchableOpacity>
+            </MenuView>
           </View>
         </View>
         <View
@@ -141,7 +216,7 @@ const Expense = ({route, navigation}) => {
               textAlign: 'center',
               marginLeft: 20,
             }}>
-            {data.title}
+            {data?.description}
           </Text>
         </View>
       </View>

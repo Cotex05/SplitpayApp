@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Alert,
   Dimensions,
@@ -17,6 +17,8 @@ import {darkColors, lightColors} from '../../constants/colors';
 import currency from '../../constants/currency';
 import GlobalStyle from '../../styles/GlobalStyle';
 import {MutedActionButton} from '../../components/Buttons';
+import {useDispatch, useSelector} from 'react-redux';
+import {fetchUserGroupBalanceGraph} from '../../slices/balanceSlice';
 
 const BalanceList = ({data, cashFlow}) => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -30,8 +32,8 @@ const BalanceList = ({data, cashFlow}) => {
       setModalVisible(true);
       return;
     }
-    const title = `${data.payer} owe you`;
-    const message = `Ask ${data.payer} to pay you ${currency.symbol}${data.amount} to settle up.`;
+    const title = `${data?.payer?.username} owe you`;
+    const message = `Ask ${data?.payer?.username} to pay you ${currency.symbol}${data.amount} to settle up.`;
     Alert.alert(title, message);
   };
 
@@ -58,7 +60,7 @@ const BalanceList = ({data, cashFlow}) => {
                 fontSize: 20,
                 fontWeight: 400,
               }}>
-              {data.payer}
+              {data?.payer?.username}
             </Text>
             <View style={{marginHorizontal: 20}}>
               <Ionicons
@@ -73,7 +75,7 @@ const BalanceList = ({data, cashFlow}) => {
                 fontSize: 20,
                 fontWeight: 400,
               }}>
-              {data.payee}
+              {data?.payee?.username}
             </Text>
           </View>
           <View>
@@ -85,7 +87,7 @@ const BalanceList = ({data, cashFlow}) => {
                 fontWeight: 500,
               }}>
               {currency.symbol}
-              {data.amount}
+              {data?.amount}
             </Text>
           </View>
         </View>
@@ -99,36 +101,43 @@ const BalanceList = ({data, cashFlow}) => {
   );
 };
 
-const BalanceGraph = ({navigation}) => {
+const BalanceGraph = ({route, navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
 
   const colors = isDarkMode ? darkColors : lightColors;
 
-  const sendPaymentTo = [
-    {
-      payer: 'You',
-      payee: 'Tyson',
-      amount: 25,
-    },
-  ];
+  const {data} = route.params;
 
-  const receivePaymentFrom = [
-    {
-      payer: 'Mark',
-      payee: 'You',
-      amount: 50,
-    },
-    {
-      payer: 'Mike Guth',
-      payee: 'You',
-      amount: 50,
-    },
-  ];
+  const dispatch = useDispatch();
+
+  const {balanceGraph, balanceLoading, balanceError, balanceSuccessMessage} =
+    useSelector(state => state.balance);
+
+  const getUserGroupBalanceGraph = async () => {
+    try {
+      const result = await dispatch(fetchUserGroupBalanceGraph(data?.groupId));
+
+      console.log('Result from getUserGroupBalanceGraph', result);
+      if (fetchUserGroupBalanceGraph.fulfilled.match(result)) {
+        console.log('Group balanceGraph fetched fulfilled!');
+        console.log('BalanceGraph ', balanceGraph);
+      } else {
+        Alert.alert(result.payload?.error, result.payload?.message);
+        console.log('BalanceGraph fetching failed:', result.payload);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getUserGroupBalanceGraph();
+  }, []);
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.background}}>
       <StatusBar barStyle={'light-content'} backgroundColor={colors.primary} />
-      <View style={{padding: 20, backgroundColor: colors.primary}}>
+      <View style={{padding: 10, backgroundColor: colors.primary}}>
         <View style={GlobalStyle.justifyBetweenRow}>
           <Text
             style={{
@@ -166,7 +175,7 @@ const BalanceGraph = ({navigation}) => {
               textAlign: 'center',
               marginLeft: 20,
             }}>
-            Flat Group
+            {data?.groupName}
           </Text>
         </View>
         <View
@@ -180,14 +189,28 @@ const BalanceGraph = ({navigation}) => {
               color: colors.text,
               padding: 10,
               fontWeight: 'bold',
-              fontSize: 25,
+              fontSize: 22,
             }}>
             You Receive
           </Text>
         </View>
-        {receivePaymentFrom.map((item, ind) => {
-          return <BalanceList cashFlow="IN" data={item} key={ind} />;
-        })}
+        {balanceGraph?.toReceive.length == 0 ? (
+          <Text
+            style={{
+              display: 'flex',
+              color: colors.muted,
+              padding: 10,
+              fontWeight: 'bold',
+              fontSize: 20,
+              alignSelf: 'center',
+            }}>
+            No balance to receive
+          </Text>
+        ) : (
+          balanceGraph?.toReceive.map((item, ind) => {
+            return <BalanceList cashFlow="IN" data={item} key={ind} />;
+          })
+        )}
         <View
           display="flex"
           flexDirection="row"
@@ -199,14 +222,28 @@ const BalanceGraph = ({navigation}) => {
               color: colors.text,
               padding: 10,
               fontWeight: 'bold',
-              fontSize: 25,
+              fontSize: 22,
             }}>
             You Pay
           </Text>
         </View>
-        {sendPaymentTo.map((item, ind) => {
-          return <BalanceList cashFlow="OUT" data={item} key={ind} />;
-        })}
+        {balanceGraph?.toSend.length == 0 ? (
+          <Text
+            style={{
+              display: 'flex',
+              color: colors.muted,
+              padding: 10,
+              fontWeight: 'bold',
+              fontSize: 20,
+              alignSelf: 'center',
+            }}>
+            Nothing to pay
+          </Text>
+        ) : (
+          balanceGraph?.toSend.map((item, ind) => {
+            return <BalanceList cashFlow="OUT" data={item} key={ind} />;
+          })
+        )}
         <View
           style={{
             marginVertical: 100,

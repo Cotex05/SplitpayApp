@@ -3,6 +3,10 @@ import userReducer from '../slices/userSlices';
 import authReducer from '../slices/authSlices';
 import groupReducer from '../slices/groupSlice';
 import groupInfoReducer from '../slices/groupInfoSlice';
+import expenseReducer from '../slices/expenseSlice';
+import expenseManagerSlice from '../slices/expenseManagerSlice';
+import balanceSlice from '../slices/balanceSlice';
+import groupManagerSlice from '../slices/groupManagerSlice';
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +14,10 @@ export const store = configureStore({
     auth: authReducer,
     group: groupReducer,
     groupInfo: groupInfoReducer,
+    groupManager: groupManagerSlice,
+    expense: expenseReducer,
+    expenseManager: expenseManagerSlice,
+    balance: balanceSlice,
   },
 });
 
