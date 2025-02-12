@@ -7,7 +7,7 @@ import expenseReducer from '../slices/expenseSlice';
 import expenseManagerSlice from '../slices/expenseManagerSlice';
 import balanceSlice from '../slices/balanceSlice';
 import groupManagerSlice from '../slices/groupManagerSlice';
-
+import paymentSlice from '../slices/paymentSlice';
 export const store = configureStore({
   reducer: {
     user: userReducer,
@@ -18,6 +18,7 @@ export const store = configureStore({
     expense: expenseReducer,
     expenseManager: expenseManagerSlice,
     balance: balanceSlice,
+    payment: paymentSlice,
   },
 });
 

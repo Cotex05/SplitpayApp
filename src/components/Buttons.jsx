@@ -5,13 +5,20 @@ import {darkColors} from '../constants/colors';
 
 const colors = darkColors;
 
-const SuccessActionButton = ({title, onPress}) => {
+const SuccessActionButton = ({title, onPress, loading}) => {
   return (
     <View>
-      <Pressable style={ButtonStyle.successActionButton} onPress={onPress}>
-        <Text style={{color: colors.white, fontWeight: 600, fontSize: 20}}>
-          {title}
-        </Text>
+      <Pressable
+        style={ButtonStyle.successActionButton}
+        onPress={onPress}
+        disabled={loading}>
+        {loading ? (
+          <ActivityIndicator size="large" color={colors.white} />
+        ) : (
+          <Text style={{color: colors.white, fontWeight: 600, fontSize: 20}}>
+            {title}
+          </Text>
+        )}
       </Pressable>
     </View>
   );

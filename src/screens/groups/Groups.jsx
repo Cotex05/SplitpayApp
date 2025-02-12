@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   Alert,
   Image,
@@ -16,28 +16,13 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {darkColors, lightColors} from '../../constants/colors';
-import CenterModal from '../../components/CenterModal';
+import {
+  CenterModalCreateGroup,
+  CenterModalJoinGroup,
+} from '../../components/CenterModal';
 import {useDispatch, useSelector} from 'react-redux';
 import {userGroups} from '../../slices/groupSlice';
-
-const sampleGroups = [
-  {
-    groupName: 'ABC',
-    membersCount: 5,
-  },
-  {
-    groupName: 'Group 1',
-    membersCount: 3,
-  },
-  {
-    groupName: 'XYZ',
-    membersCount: 2,
-  },
-  {
-    groupName: 'Flat Room',
-    membersCount: 4,
-  },
-];
+import {MenuView} from '@react-native-menu/menu';
 
 const GroupList = ({data}) => {
   const navigation = useNavigation();
@@ -92,9 +77,9 @@ const GroupList = ({data}) => {
                 display: 'flex',
                 color: 'gray',
                 fontWeight: 'bold',
-                fontSize: 15,
+                fontSize: 12,
               }}>
-              3 members
+              {new Date(data?.createdAt).toLocaleDateString('en-GB')}
             </Text>
           </View>
         </View>
@@ -128,7 +113,18 @@ const Groups = ({navigation}) => {
 
   const colors = isDarkMode ? darkColors : lightColors;
 
-  const [modalVisible, setModalVisible] = useState(false);
+  const [createGroupModalVisible, setCreateGroupModalVisible] = useState(false);
+  const [joinGroupModalVisible, setJoinGroupModalVisible] = useState(false);
+
+  const menuRef = useRef(null);
+
+  const handleMenuClose = () => {
+    console.log('pop menu closed!');
+  };
+
+  const handleGroupJoin = async () => {
+    setJoinGroupModalVisible(true);
+  };
 
   const dispatch = useDispatch();
   const {groups, loading, error, successMessage} = useSelector(
@@ -184,13 +180,37 @@ const Groups = ({navigation}) => {
           </Text>
         </View>
         <View>
-          <TouchableOpacity>
-            <Ionicons
-              name="ellipsis-vertical"
-              color={colors.header}
-              size={24}
-            />
-          </TouchableOpacity>
+          <MenuView
+            ref={menuRef}
+            title="Menu"
+            onPressAction={({nativeEvent}) => {
+              if (nativeEvent.event == 'join') {
+                handleGroupJoin();
+              } else if (nativeEvent.event == 'close') {
+                handleMenuClose();
+              }
+            }}
+            actions={[
+              {
+                id: 'join',
+                title: 'Join group',
+                titleColor: colors.text,
+              },
+              {
+                id: 'close',
+                title: 'Close',
+                titleColor: colors.text,
+              },
+            ]}
+            shouldOpenOnLongPress={false}>
+            <TouchableOpacity>
+              <Ionicons
+                name="ellipsis-vertical"
+                color={colors.header}
+                size={24}
+              />
+            </TouchableOpacity>
+          </MenuView>
         </View>
       </View>
       <ScrollView>
@@ -200,7 +220,7 @@ const Groups = ({navigation}) => {
       </ScrollView>
       <TouchableOpacity
         activeOpacity={0.75}
-        onPress={() => setModalVisible(true)}
+        onPress={() => setCreateGroupModalVisible(true)}
         style={{
           backgroundColor: colors.primary,
           position: 'absolute',
@@ -215,9 +235,13 @@ const Groups = ({navigation}) => {
         }}>
         <Ionicons name="add" size={36} color={colors.header} />
       </TouchableOpacity>
-      <CenterModal
-        modalVisible={modalVisible}
-        setModalVisible={setModalVisible}
+      <CenterModalCreateGroup
+        modalVisible={createGroupModalVisible}
+        setModalVisible={setCreateGroupModalVisible}
+      />
+      <CenterModalJoinGroup
+        modalVisible={joinGroupModalVisible}
+        setModalVisible={setJoinGroupModalVisible}
       />
     </SafeAreaView>
   );

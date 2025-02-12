@@ -20,7 +20,7 @@ import {MutedActionButton} from '../../components/Buttons';
 import {useDispatch, useSelector} from 'react-redux';
 import {fetchUserGroupBalanceGraph} from '../../slices/balanceSlice';
 
-const BalanceList = ({data, cashFlow}) => {
+const BalanceList = ({data, cashFlow, groupData}) => {
   const isDarkMode = useColorScheme() === 'dark';
 
   const colors = isDarkMode ? darkColors : lightColors;
@@ -96,6 +96,7 @@ const BalanceList = ({data, cashFlow}) => {
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
         data={data}
+        groupData={groupData}
       />
     </View>
   );
@@ -241,7 +242,14 @@ const BalanceGraph = ({route, navigation}) => {
           </Text>
         ) : (
           balanceGraph?.toSend.map((item, ind) => {
-            return <BalanceList cashFlow="OUT" data={item} key={ind} />;
+            return (
+              <BalanceList
+                cashFlow="OUT"
+                data={item}
+                key={ind}
+                groupData={data}
+              />
+            );
           })
         )}
         <View

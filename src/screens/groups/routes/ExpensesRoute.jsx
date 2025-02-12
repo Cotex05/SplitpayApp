@@ -137,7 +137,7 @@ const ExpenseList = ({data}) => {
               paddingVertical: 5,
               fontSize: 12,
             }}>
-            {new Date(data?.createdAt).toLocaleDateString()}
+            {new Date(data?.createdAt).toLocaleDateString('en-GB')}
           </Text>
         </View>
       </View>
@@ -217,6 +217,17 @@ const ExpensesRoute = ({data}) => {
           </Text>
         </View>
         <ScrollView>
+          {expenses.length == 0 ? (
+            <Text
+              style={{
+                color: colors.muted,
+                fontSize: 18,
+                padding: 12,
+                alignSelf: 'center',
+              }}>
+              No expenses yet!
+            </Text>
+          ) : null}
           {expenses.map((item, index) => {
             return <ExpenseList data={item} key={index} />;
           })}

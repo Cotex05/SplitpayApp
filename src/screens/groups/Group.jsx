@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import {useNavigation} from '@react-navigation/native';
-import React, {useEffect, useRef} from 'react';
+import React, {Suspense, useEffect, useRef} from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -18,12 +18,16 @@ import {darkColors, lightColors} from '../../constants/colors';
 import GlobalStyle from '../../styles/GlobalStyle';
 
 import {SceneMap, TabBar, TabView} from 'react-native-tab-view';
-import ExpensesRoute from './routes/ExpensesRoute';
-import OverviewRoute from './routes/OverviewRoute';
-import SettlementsRoute from './routes/SettementsRoute';
+
 import {MenuView} from '@react-native-menu/menu';
 import {useDispatch, useSelector} from 'react-redux';
 import {fetchGroupInfo, fetchGroupMembers} from '../../slices/groupInfoSlice';
+import LoadingBox from '../../components/LoadingBox';
+import {APP_NAME} from '../../constants/names';
+
+const SettlementsRoute = React.lazy(() => import('./routes/SettementsRoute'));
+const ExpensesRoute = React.lazy(() => import('./routes/ExpensesRoute'));
+const OverviewRoute = React.lazy(() => import('./routes/OverviewRoute'));
 
 const routes = [
   {key: 'first', title: 'Overview'},
@@ -32,8 +36,6 @@ const routes = [
 ];
 
 const Group = ({route, navigation}) => {
-  // const navigation = useNavigation();
-
   const isDarkMode = useColorScheme() === 'dark';
 
   const colors = isDarkMode ? darkColors : lightColors;
@@ -54,7 +56,7 @@ const Group = ({route, navigation}) => {
   const handleGroupInvite = async () => {
     try {
       const result = await Share.share({
-        message: `Invite people to this group!`,
+        message: `Hey! Join our group ${data?.groupName} on ${APP_NAME} using invite code "${data?.groupCode}"`,
       });
       if (result.action === Share.sharedAction) {
         if (result.activityType) {
@@ -125,110 +127,115 @@ const Group = ({route, navigation}) => {
       case 'second':
         return <ExpensesRoute data={data} />;
       case 'third':
-        return <SettlementsRoute />;
+        return <SettlementsRoute data={data} />;
       default:
         return null;
     }
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: colors.background}}>
-      <StatusBar barStyle={'light-content'} backgroundColor={colors.primary} />
-      <View style={{padding: 20, backgroundColor: colors.primary}}>
-        <View style={GlobalStyle.justifyBetweenRow}>
-          <View style={GlobalStyle.justifyCenterRow}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={{paddingVertical: 5, marginRight: 10}}>
-              <Ionicons
-                name="chevron-back-outline"
-                color={colors.header}
-                size={30}
-              />
-            </TouchableOpacity>
-            <Text
-              style={{
-                marginHorizontal: 20,
-                color: colors.header,
-                fontSize: 30,
-                fontWeight: 'bold',
-                textAlign: 'center',
-              }}>
-              {data?.groupName}
-            </Text>
-          </View>
-          <View>
-            <MenuView
-              ref={menuRef}
-              title="Menu"
-              onPressAction={({nativeEvent}) => {
-                if (nativeEvent.event == 'invite') {
-                  handleGroupInvite();
-                } else if (nativeEvent.event == 'edit') {
-                  handleGroupEdit();
-                } else if (nativeEvent.event == 'close') {
-                  handleGroupClose();
-                }
-              }}
-              actions={[
-                {
-                  id: 'invite',
-                  title: 'Invite',
-                  titleColor: colors.text,
-                },
-                {
-                  id: 'edit',
-                  title: 'Edit group',
-                  titleColor: colors.text,
-                },
-                {
-                  id: 'close',
-                  title: 'Close',
-                  titleColor: colors.text,
-                },
-              ]}
-              shouldOpenOnLongPress={false}>
-              <TouchableOpacity>
+    <Suspense fallback={<LoadingBox />}>
+      <SafeAreaView style={{flex: 1, backgroundColor: colors.background}}>
+        <StatusBar
+          barStyle={'light-content'}
+          backgroundColor={colors.primary}
+        />
+        <View style={{padding: 20, backgroundColor: colors.primary}}>
+          <View style={GlobalStyle.justifyBetweenRow}>
+            <View style={GlobalStyle.justifyCenterRow}>
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                style={{paddingVertical: 5, marginRight: 10}}>
                 <Ionicons
-                  name="ellipsis-vertical"
+                  name="chevron-back-outline"
                   color={colors.header}
-                  size={24}
+                  size={30}
                 />
               </TouchableOpacity>
-            </MenuView>
+              <Text
+                style={{
+                  marginHorizontal: 20,
+                  color: colors.header,
+                  fontSize: 30,
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                }}>
+                {data?.groupName}
+              </Text>
+            </View>
+            <View>
+              <MenuView
+                ref={menuRef}
+                title="Menu"
+                onPressAction={({nativeEvent}) => {
+                  if (nativeEvent.event == 'invite') {
+                    handleGroupInvite();
+                  } else if (nativeEvent.event == 'edit') {
+                    handleGroupEdit();
+                  } else if (nativeEvent.event == 'close') {
+                    handleGroupClose();
+                  }
+                }}
+                actions={[
+                  {
+                    id: 'invite',
+                    title: 'Invite',
+                    titleColor: colors.text,
+                  },
+                  {
+                    id: 'edit',
+                    title: 'Edit group',
+                    titleColor: colors.text,
+                  },
+                  {
+                    id: 'close',
+                    title: 'Close',
+                    titleColor: colors.text,
+                  },
+                ]}
+                shouldOpenOnLongPress={false}>
+                <TouchableOpacity>
+                  <Ionicons
+                    name="ellipsis-vertical"
+                    color={colors.header}
+                    size={24}
+                  />
+                </TouchableOpacity>
+              </MenuView>
+            </View>
           </View>
         </View>
-      </View>
-      {loading ? (
-        <View style={{padding: 12}}>
-          <ActivityIndicator size="large" color={colors.tertiary} />
-        </View>
-      ) : (
-        <TabView
-          renderTabBar={renderTabBar}
-          navigationState={{index, routes}}
-          renderScene={renderScene}
-          onIndexChange={setIndex}
-          initialLayout={{width: layout.width}}
-        />
-      )}
-      <TouchableOpacity
-        activeOpacity={0.75}
-        onPress={() => navigation.navigate('ExpenseManager', {data: data})}
-        style={{
-          backgroundColor: colors.primary,
-          position: 'absolute',
-          alignItems: 'center',
-          justifyContent: 'center',
-          bottom: 20,
-          right: 15,
-          width: 75,
-          height: 75,
-          borderRadius: 50,
-        }}>
-        <Ionicons name="wallet-outline" size={36} color={colors.header} />
-      </TouchableOpacity>
-    </SafeAreaView>
+        {loading ? (
+          <View style={{padding: 12}}>
+            <ActivityIndicator size="large" color={colors.tertiary} />
+          </View>
+        ) : (
+          <TabView
+            renderTabBar={renderTabBar}
+            navigationState={{index, routes}}
+            renderScene={renderScene}
+            onIndexChange={setIndex}
+            initialLayout={{width: layout.width}}
+          />
+        )}
+        <TouchableOpacity
+          activeOpacity={0.75}
+          onPress={() => navigation.navigate('ExpenseManager', {data: data})}
+          style={{
+            backgroundColor: colors.primary,
+            position: 'absolute',
+            alignItems: 'center',
+            justifyContent: 'center',
+            bottom: 20,
+            right: 15,
+            width: 75,
+            height: 75,
+            borderRadius: 50,
+          }}>
+          <Ionicons name="wallet-outline" size={36} color={colors.header} />
+        </TouchableOpacity>
+      </SafeAreaView>
+    </Suspense>
   );
 };
 

@@ -18,10 +18,30 @@ export const userGroups = createAsyncThunk(
   },
 );
 
+// Async Thunk for join group (POST Request)
+export const joinGroupByGroupCode = createAsyncThunk(
+  'groups/join',
+  async (groupCode, {rejectWithValue}) => {
+    try {
+      const response = await AxiosInstance.post(
+        `/groups/member/invite/add?groupCode=${groupCode}`,
+      );
+      console.log('Join group response: ', response);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(
+        error.response ? error.response.data : error.message,
+      );
+    }
+  },
+);
+
 // Group Slice
 const groupSlice = createSlice({
   name: 'group',
   initialState: {
+    response: null,
     groups: [],
     loading: false,
     error: null,
@@ -40,6 +60,20 @@ const groupSlice = createSlice({
         state.successMessage = 'Groups fetched successfully!';
       })
       .addCase(userGroups.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message;
+      })
+
+      .addCase(joinGroupByGroupCode.pending, state => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(joinGroupByGroupCode.fulfilled, (state, action) => {
+        state.loading = false;
+        state.response = action.payload;
+        state.successMessage = 'Joined group successfully!';
+      })
+      .addCase(joinGroupByGroupCode.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message;
       });

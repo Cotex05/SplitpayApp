@@ -25,6 +25,7 @@ import {saveExpense} from '../../slices/expenseManagerSlice';
 import {
   fetchExpenseCashFlow,
   fetchGroupExpenses,
+  fetchUserExpenseStats,
 } from '../../slices/expenseSlice';
 import GlobalStyle from '../../styles/GlobalStyle';
 import {fetchUserGroupBalanceGraph} from '../../slices/balanceSlice';
@@ -88,6 +89,7 @@ const ExpenseManager = ({route, navigation}) => {
         dispatch(fetchGroupExpenses(data?.groupId));
         dispatch(fetchUserGroupBalanceGraph(data?.groupId));
         dispatch(fetchExpenseCashFlow(data?.groupId));
+        dispatch(fetchUserExpenseStats());
         navigation.goBack();
       } else {
         console.log('Failed to save expense:', resultAction.payload);
@@ -193,7 +195,7 @@ const ExpenseManager = ({route, navigation}) => {
               maxLength={10}
             />
             <Text style={{color: colors.muted, padding: 2}}>
-              This amount will be splitted equally including you
+              This amount will be splitted equally
             </Text>
           </View>
           <View

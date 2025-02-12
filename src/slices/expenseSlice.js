@@ -38,10 +38,28 @@ export const fetchGroupExpenses = createAsyncThunk(
   },
 );
 
+// Async Thunk for User expense stats (GET Request)
+export const fetchUserExpenseStats = createAsyncThunk(
+  'expenses/stats',
+  async (_, {rejectWithValue}) => {
+    try {
+      const response = await AxiosInstance.get(`/expenses/user/stats`);
+      console.log('User expense stats response: ', response);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(
+        error.response ? error.response.data : error.message,
+      );
+    }
+  },
+);
+
 export // Expense Slice
 const expenseSlice = createSlice({
   name: 'expense',
   initialState: {
+    expenseStats: null,
     cashflow: null,
     expenses: [],
     expenseLoading: false,
@@ -75,6 +93,20 @@ const expenseSlice = createSlice({
         state.expenseSuccessMessage = 'Group expenses fetched!';
       })
       .addCase(fetchGroupExpenses.rejected, (state, action) => {
+        state.expenseLoading = false;
+        state.expenseError = action.payload?.message;
+      })
+
+      .addCase(fetchUserExpenseStats.pending, state => {
+        state.expenseLoading = true;
+        state.expenseError = null;
+      })
+      .addCase(fetchUserExpenseStats.fulfilled, (state, action) => {
+        state.expenseLoading = false;
+        state.expenseStats = action.payload;
+        state.expenseSuccessMessage = 'User expense stats fetched!';
+      })
+      .addCase(fetchUserExpenseStats.rejected, (state, action) => {
         state.expenseLoading = false;
         state.expenseError = action.payload?.message;
       });

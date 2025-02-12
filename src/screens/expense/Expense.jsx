@@ -30,6 +30,15 @@ const ExpenseList = ({title, value}) => {
 
   const colors = isDarkMode ? darkColors : lightColors;
 
+  const showExpenseShareMembers = () => {
+    let members = '';
+    value.forEach(share => {
+      members += share?.user?.username + ', ';
+    });
+    members = members.slice(0, members.length - 2);
+    Alert.alert('Expense for: ', members);
+  };
+
   return (
     <View
       style={{
@@ -44,9 +53,19 @@ const ExpenseList = ({title, value}) => {
       <Text style={{color: colors.dark, fontWeight: 600, fontSize: 20}}>
         {title}
       </Text>
-      <Text style={{color: colors.dark, fontWeight: 600, fontSize: 20}}>
-        {value}
-      </Text>
+      {title == 'For' ? (
+        <TouchableOpacity
+          activeOpacity={0.75}
+          onPress={showExpenseShareMembers}>
+          <Text style={{color: colors.tertiary, fontWeight: 600, fontSize: 20}}>
+            View
+          </Text>
+        </TouchableOpacity>
+      ) : (
+        <Text style={{color: colors.dark, fontWeight: 600, fontSize: 20}}>
+          {value}
+        </Text>
+      )}
     </View>
   );
 };
@@ -116,12 +135,12 @@ const Expense = ({route, navigation}) => {
 
     {
       title: 'For',
-      value: data?.shares.length,
+      value: data?.shares,
     },
 
     {
       title: 'Created on',
-      value: new Date(data?.createdAt).toLocaleDateString(),
+      value: new Date(data?.createdAt).toLocaleDateString('en-GB'),
     },
   ];
 

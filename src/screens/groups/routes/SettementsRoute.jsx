@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import {useNavigation} from '@react-navigation/native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   ScrollView,
   Text,
@@ -11,6 +11,8 @@ import {
 import {darkColors, lightColors} from '../../../constants/colors';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import currency from '../../../constants/currency';
+import {useDispatch, useSelector} from 'react-redux';
+import {fetchUserPaymentsInGroup} from '../../../slices/paymentSlice';
 
 const sampleTransactions = [
   {
@@ -36,16 +38,23 @@ const sampleTransactions = [
   },
 ];
 
-const TransactionList = ({data}) => {
+const TransactionList = ({data, currUser}) => {
   const navigation = useNavigation();
   const isDarkMode = useColorScheme() === 'dark';
 
   const colors = isDarkMode ? darkColors : lightColors;
 
+  const cashFlow = currUser?.id == data?.payer?.userId ? 'OUT' : 'IN';
+
   return (
     <TouchableOpacity
       activeOpacity={0.75}
-      onPress={() => navigation.navigate('SettledTransaction', {data: data})}>
+      onPress={() =>
+        navigation.navigate('SettledTransaction', {
+          data: data,
+          cashFlow: cashFlow,
+        })
+      }>
       <View
         style={{
           display: 'flex',
@@ -56,9 +65,9 @@ const TransactionList = ({data}) => {
         }}>
         <View style={{display: 'flex', flexDirection: 'row', marginLeft: 20}}>
           <Ionicons
-            name={data.cashFlow == 'IN' ? 'arrow-forward' : 'arrow-back'}
+            name={cashFlow == 'IN' ? 'arrow-forward' : 'arrow-back'}
             size={50}
-            color={data.cashFlow == 'IN' ? colors.green : colors.red}
+            color={cashFlow == 'IN' ? colors.green : colors.red}
             style={{
               width: 50,
               height: 50,
@@ -78,7 +87,7 @@ const TransactionList = ({data}) => {
                 fontWeight: 'bold',
                 fontSize: 18,
               }}>
-              {data.payer}
+              {cashFlow == 'IN' ? data?.payer?.username : data?.payee?.username}
             </Text>
             <Text
               style={{
@@ -87,7 +96,7 @@ const TransactionList = ({data}) => {
                 fontWeight: 400,
                 fontSize: 14,
               }}>
-              {data.date}
+              {new Date(data?.paymentDate).toLocaleDateString('en-GB')}
             </Text>
           </View>
         </View>
@@ -95,14 +104,14 @@ const TransactionList = ({data}) => {
           style={{display: 'flex', justifyContent: 'center', marginRight: 10}}>
           <Text
             style={{
-              color: data.cashFlow == 'IN' ? colors.green : colors.red,
+              color: cashFlow == 'IN' ? colors.green : colors.red,
               padding: 10,
               fontWeight: 'bold',
               fontSize: 20,
             }}>
-            {data.cashFlow == 'IN' ? '+ ' : '- '}
+            {cashFlow == 'IN' ? '+ ' : '- '}
             {currency.symbol}
-            {data.amount}
+            {data?.amount}
           </Text>
         </View>
       </View>
@@ -110,12 +119,38 @@ const TransactionList = ({data}) => {
   );
 };
 
-const SettlementsRoute = () => {
+const SettlementsRoute = ({data}) => {
   const navigation = useNavigation();
 
   const isDarkMode = useColorScheme() === 'dark';
 
   const colors = isDarkMode ? darkColors : lightColors;
+
+  const dispatch = useDispatch();
+  const {payments, paymentLoading, paymentError, paymentSuccessMessage} =
+    useSelector(state => state.payment);
+
+  const {user} = useSelector(state => state.auth);
+
+  const getUserPayementsInGroup = async () => {
+    try {
+      const result = await dispatch(fetchUserPaymentsInGroup(data?.groupId));
+
+      console.log('Result from getUserPayementsInGroup', result);
+      if (fetchUserPaymentsInGroup.fulfilled.match(result)) {
+        console.log('Payments fetched fulfilled!');
+      } else {
+        Alert.alert(result.payload?.error, result.payload?.message);
+        console.log('Payments fetching failed:', result.payload);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getUserPayementsInGroup();
+  }, []);
 
   return (
     <View>
@@ -132,12 +167,23 @@ const SettlementsRoute = () => {
             fontWeight: 'bold',
             fontSize: 20,
           }}>
-          Transactions
+          Your Payments
         </Text>
       </View>
       <ScrollView>
-        {sampleTransactions.map((item, index) => {
-          return <TransactionList data={item} key={index} />;
+        {payments?.length == 0 ? (
+          <Text
+            style={{
+              color: colors.muted,
+              fontSize: 18,
+              padding: 12,
+              alignSelf: 'center',
+            }}>
+            No payments yet!
+          </Text>
+        ) : null}
+        {payments.map((item, index) => {
+          return <TransactionList data={item} currUser={user} key={index} />;
         })}
       </ScrollView>
     </View>

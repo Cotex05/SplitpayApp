@@ -282,10 +282,22 @@ const OverviewRoute = ({data}) => {
             fontWeight: 'bold',
             fontSize: 20,
           }}>
-          Net Balance
+          Expense Balance
         </Text>
       </View>
       <ScrollView>
+        {balanceGraph?.toReceive.length == 0 &&
+        balanceGraph?.toSend.length == 0 ? (
+          <Text
+            style={{
+              color: colors.muted,
+              fontSize: 18,
+              padding: 12,
+              alignSelf: 'center',
+            }}>
+            All expenses are clear!
+          </Text>
+        ) : null}
         {balanceGraph?.toSend.map((item, index) => {
           return (
             <MemberList

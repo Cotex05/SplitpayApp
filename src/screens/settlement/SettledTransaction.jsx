@@ -1,27 +1,26 @@
 /* eslint-disable react-native/no-inline-styles */
+import React from 'react';
 import {
-  View,
-  Text,
-  useColorScheme,
+  Dimensions,
   SafeAreaView,
   StatusBar,
-  Dimensions,
+  Text,
   TouchableOpacity,
+  useColorScheme,
+  View,
 } from 'react-native';
-import React from 'react';
-import {darkColors, lightColors} from '../../constants/colors';
-import GlobalStyle from '../../styles/GlobalStyle';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {useNavigation} from '@react-navigation/native';
-import currency from '../../constants/currency';
 import {MutedActionButton} from '../../components/Buttons';
+import {darkColors, lightColors} from '../../constants/colors';
+import currency from '../../constants/currency';
+import GlobalStyle from '../../styles/GlobalStyle';
 
 const SettledTransaction = ({route, navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
 
   const colors = isDarkMode ? darkColors : lightColors;
 
-  const {data} = route.params;
+  const {data, cashFlow} = route.params;
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.background}}>
@@ -66,13 +65,13 @@ const SettledTransaction = ({route, navigation}) => {
               fontSize: 25,
               fontWeight: 400,
             }}>
-            {data.payer == 'John' ? 'You' : data.payer}
+            {cashFlow == 'IN' ? data?.payer?.username : 'You'}
           </Text>
           <View>
             <Ionicons
               name={'arrow-forward'}
               size={40}
-              color={data.cashFlow == 'IN' ? colors.green : colors.red}
+              color={cashFlow == 'IN' ? colors.green : colors.red}
             />
           </View>
 
@@ -82,7 +81,7 @@ const SettledTransaction = ({route, navigation}) => {
               fontSize: 25,
               fontWeight: 400,
             }}>
-            {data.payee == 'John' ? 'You' : data.payee}
+            {cashFlow == 'IN' ? 'You' : data?.payee?.username}
           </Text>
         </View>
       </View>
@@ -100,7 +99,7 @@ const SettledTransaction = ({route, navigation}) => {
           Amount
         </Text>
         <Text style={{color: colors.dark, fontWeight: 600, fontSize: 20}}>
-          {currency.symbol} {data.amount}
+          {currency.symbol} {data?.amount}
         </Text>
       </View>
       <View
@@ -134,7 +133,7 @@ const SettledTransaction = ({route, navigation}) => {
           Paid By
         </Text>
         <Text style={{color: colors.dark, fontWeight: 600, fontSize: 20}}>
-          {data.payer}
+          {cashFlow == 'IN' ? data?.payer?.username : 'You'}
         </Text>
       </View>
       <View
@@ -151,7 +150,7 @@ const SettledTransaction = ({route, navigation}) => {
           Paid On
         </Text>
         <Text style={{color: colors.dark, fontWeight: 600, fontSize: 20}}>
-          {data.date}
+          {new Date(data?.paymentDate).toLocaleDateString('en-GB')}
         </Text>
       </View>
       <View

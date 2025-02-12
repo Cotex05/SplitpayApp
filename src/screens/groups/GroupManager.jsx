@@ -254,6 +254,13 @@ const GroupManager = ({route, navigation}) => {
 
   const handleGroupCreation = async () => {
     try {
+      if (members.length == 0) {
+        Alert.alert(
+          'No members added!',
+          'Please add members to this group first.',
+        );
+        return;
+      }
       await saveGroup();
       navigation.goBack();
     } catch (error) {
@@ -264,7 +271,6 @@ const GroupManager = ({route, navigation}) => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={-100}
       style={{flex: 1}}>
       <SafeAreaView style={{flex: 1, backgroundColor: colors.background}}>
         <StatusBar
