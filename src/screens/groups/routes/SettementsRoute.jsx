@@ -140,7 +140,6 @@ const SettlementsRoute = ({data}) => {
       if (fetchUserPaymentsInGroup.fulfilled.match(result)) {
         console.log('Payments fetched fulfilled!');
       } else {
-        Alert.alert(result.payload?.error, result.payload?.message);
         console.log('Payments fetching failed:', result.payload);
       }
     } catch (error) {

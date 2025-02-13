@@ -47,7 +47,6 @@ const BottomModal = ({modalVisible, setModalVisible, data, groupData}) => {
         console.log('Payment process fulfilled!');
         showToastWithGravity('Payment successful!');
       } else {
-        Alert.alert(result.payload?.error, result.payload?.message);
         console.log('Payments processing failed:', result.payload);
       }
     } catch (error) {

@@ -174,7 +174,6 @@ const ExpensesRoute = ({data}) => {
         console.log('Group Expenses fetched fulfilled!');
         console.log('Expenses ', expenses);
       } else {
-        Alert.alert(result.payload?.error, result.payload?.message);
         console.log('Group expenses fetching failed:', result.payload);
       }
     } catch (error) {

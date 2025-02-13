@@ -186,7 +186,8 @@ const Profile = () => {
             </View>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('MyUPIs')}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('MyUPIs', {userData: user})}>
           <View
             style={{
               display: 'flex',

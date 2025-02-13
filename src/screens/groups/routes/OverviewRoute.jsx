@@ -147,6 +147,7 @@ const OverviewRoute = ({data}) => {
     await getExpenseCashFlow();
     await getUserGroupBalanceGraph();
     setRefreshing(false);
+    showToastWithGravity('Refreshed!');
   }, []);
 
   const dispatch = useDispatch();
@@ -169,7 +170,6 @@ const OverviewRoute = ({data}) => {
         console.log('Group balanceGraph fetched fulfilled!');
         console.log('BalanceGraph ', balanceGraph);
       } else {
-        Alert.alert(result.payload?.error, result.payload?.message);
         console.log('BalanceGraph fetching failed:', result.payload);
       }
     } catch (error) {
@@ -186,7 +186,6 @@ const OverviewRoute = ({data}) => {
         console.log('Expense cashflow fetched fulfilled!');
         console.log('cashflow ', cashflow);
       } else {
-        Alert.alert(result.payload?.error, result.payload?.message);
         console.log('Expense cashflow fetching failed:', result.payload);
       }
     } catch (error) {

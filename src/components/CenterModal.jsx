@@ -107,7 +107,6 @@ const CenterModalJoinGroup = ({modalVisible, setModalVisible}) => {
         showToastWithGravity('Group joined!');
         console.log('Group joining fulfilled!');
       } else {
-        Alert.alert('Error: ', result.payload?.message);
         console.log('Group joining failed:', result.payload);
       }
     } catch (err) {

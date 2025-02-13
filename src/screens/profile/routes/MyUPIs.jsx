@@ -1,10 +1,12 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
+  Keyboard,
   StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   useColorScheme,
   View,
 } from 'react-native';
@@ -13,164 +15,162 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {darkColors, lightColors} from '../../../constants/colors';
 import GlobalStyle from '../../../styles/GlobalStyle';
+import {AccentActionButton} from '../../../components/Buttons';
+import {useDispatch, useSelector} from 'react-redux';
+import {addUserUpi, fetchUserUpi} from '../../../slices/upiSlice';
+import {showToastWithGravity} from '../../../components/native/AndroidComponents';
 
-const MyUPIsScreen = ({navigation}) => {
+const MyUPIsScreen = ({route, navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
 
   const colors = isDarkMode ? darkColors : lightColors;
 
-  const [primaryUPI, setPrimaryUPI] = useState('john.doe@oksbi');
+  const [primaryUPI, setPrimaryUPI] = useState('');
 
-  const [secondaryUPI, setSecondaryUPI] = useState('');
+  const {userData} = route.params;
+
+  const dispatch = useDispatch();
+
+  const {upiDetails, upiLoading, upiError, upiSuccessMessage} = useSelector(
+    state => state.upi,
+  );
+
+  const getUserUpiAddress = async () => {
+    try {
+      const result = await dispatch(fetchUserUpi(userData?.username));
+
+      console.log('Result from getUserUpiAddress', result);
+      if (fetchUserUpi.fulfilled.match(result)) {
+        const upi = result.payload[0]?.upiAddress;
+        setPrimaryUPI(upi);
+        console.log('User upi details fetched fulfilled!', upi);
+      } else {
+        console.log('Upi fetching failed:', result.payload);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const addUpiAddress = async () => {
+    try {
+      console.log('From addUpiAddress(): ', upiDetails, primaryUPI);
+      const result = await dispatch(addUserUpi({upiDetails, primaryUPI}));
+
+      console.log('Result from addUpiAddress', result);
+      if (addUserUpi.fulfilled.match(result)) {
+        setPrimaryUPI(result.payload?.upiAddress);
+        showToastWithGravity('UPI Saved!');
+        console.log('UPI saving success!');
+      } else {
+        console.log('Upi adding failed:', result.payload);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleUpiSave = async () => {
+    Keyboard.dismiss();
+    await addUpiAddress();
+  };
+
+  useEffect(() => {
+    getUserUpiAddress();
+  }, []);
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: colors.background}}>
-      <StatusBar barStyle={'light-content'} backgroundColor={colors.primary} />
-      <View style={{padding: 20, backgroundColor: colors.primary}}>
-        <View style={GlobalStyle.justifyBetweenRow}>
-          <View style={GlobalStyle.justifyCenterRow}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={{paddingVertical: 5, marginRight: 10}}>
-              <Ionicons
-                name="chevron-back-outline"
-                color={colors.header}
-                size={30}
-              />
-            </TouchableOpacity>
-            <Text
-              style={{
-                marginHorizontal: 20,
-                color: colors.header,
-                fontSize: 30,
-                fontWeight: 'bold',
-                textAlign: 'center',
-              }}>
-              My UPIs
-            </Text>
-          </View>
-          <View>
-            <TouchableOpacity>
-              <Ionicons
-                name="ellipsis-vertical"
-                color={colors.header}
-                size={24}
-              />
-            </TouchableOpacity>
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <SafeAreaView style={{flex: 1, backgroundColor: colors.background}}>
+        <StatusBar
+          barStyle={'light-content'}
+          backgroundColor={colors.primary}
+        />
+        <View style={{padding: 20, backgroundColor: colors.primary}}>
+          <View style={GlobalStyle.justifyBetweenRow}>
+            <View style={GlobalStyle.justifyCenterRow}>
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                style={{paddingVertical: 5, marginRight: 10}}>
+                <Ionicons
+                  name="chevron-back-outline"
+                  color={colors.header}
+                  size={30}
+                />
+              </TouchableOpacity>
+              <Text
+                style={{
+                  marginHorizontal: 20,
+                  color: colors.header,
+                  fontSize: 30,
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                }}>
+                My UPIs
+              </Text>
+            </View>
+            <View>
+              <TouchableOpacity>
+                <Ionicons
+                  name="ellipsis-vertical"
+                  color={colors.header}
+                  size={24}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </View>
-      <View
-        style={{
-          margin: 12,
-        }}>
-        <Text
+        <View
           style={{
-            padding: 5,
-            color: colors.text,
-            fontSize: 20,
-            fontWeight: 600,
+            margin: 12,
           }}>
-          Primary UPI Id
-        </Text>
-        <TextInput
-          style={{
-            height: 50,
-            width: Dimensions.get('screen').width - 40,
-            borderRadius: 10,
-            borderWidth: 2,
-            padding: 10,
-            borderColor: colors.muted,
-            color: colors.text,
-            fontSize: 18,
-            fontWeight: 500,
-          }}
-          placeholderTextColor={colors.muted}
-          onChangeText={setPrimaryUPI}
-          placeholder="Enter UPI"
-          value={primaryUPI}
-          keyboardType="email-address"
-        />
-        <Text style={{color: colors.muted, padding: 2}}>
-          You will receive the payment in this UPI Id
-        </Text>
-      </View>
-
-      <View
-        style={{
-          margin: 12,
-        }}>
-        <Text
-          style={{
-            padding: 5,
-            color: colors.text,
-            fontSize: 20,
-            fontWeight: 600,
-          }}>
-          Secondary UPI Id
-        </Text>
-        <TextInput
-          style={{
-            height: 50,
-            width: Dimensions.get('screen').width - 40,
-            borderRadius: 10,
-            borderWidth: 2,
-            padding: 10,
-            borderColor: colors.muted,
-            color: colors.text,
-            fontSize: 18,
-            fontWeight: 500,
-          }}
-          placeholderTextColor={colors.muted}
-          onChangeText={setSecondaryUPI}
-          placeholder="Enter UPI"
-          value={secondaryUPI}
-          keyboardType="email-address"
-        />
-      </View>
-
-      <View
-        style={[
-          GlobalStyle.justifyCenterRow,
-          {position: 'absolute', bottom: 50, alignSelf: 'center'},
-        ]}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          activeOpacity={0.75}
-          style={{
-            width: 100,
-            height: 50,
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginHorizontal: 20,
-            borderWidth: 2,
-            borderColor: colors.red,
-            borderRadius: 10,
-          }}>
-          <Text style={{color: colors.red, fontWeight: 'bold', fontSize: 25}}>
-            Cancel
+          <Text
+            style={{
+              padding: 5,
+              color: colors.text,
+              fontSize: 20,
+              fontWeight: 600,
+            }}>
+            Primary UPI Id
           </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          activeOpacity={0.75}
-          style={{
-            width: 100,
-            height: 50,
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginHorizontal: 20,
-            backgroundColor: colors.accent,
-            borderWidth: 2,
-            borderColor: colors.accent,
-            borderRadius: 10,
-          }}>
-          <Text style={{color: colors.white, fontWeight: 'bold', fontSize: 25}}>
-            Save
+          <TextInput
+            style={{
+              height: 50,
+              width: Dimensions.get('screen').width - 40,
+              borderRadius: 10,
+              borderWidth: 2,
+              padding: 10,
+              borderColor: colors.muted,
+              color: colors.text,
+              fontSize: 18,
+              fontWeight: 500,
+            }}
+            placeholderTextColor={colors.muted}
+            onChangeText={setPrimaryUPI}
+            placeholder="Enter UPI"
+            value={primaryUPI}
+            keyboardType="email-address"
+          />
+          <Text style={{color: colors.muted, padding: 2}}>
+            You will receive the payment in this UPI Id
           </Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+        </View>
+
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 20,
+            margin: 10,
+          }}>
+          <AccentActionButton
+            title="Save"
+            onPress={handleUpiSave}
+            loading={upiLoading}
+          />
+        </View>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 };
 export default MyUPIsScreen;

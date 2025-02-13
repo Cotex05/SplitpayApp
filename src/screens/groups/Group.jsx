@@ -86,7 +86,6 @@ const Group = ({route, navigation}) => {
         console.log('Group info fetched fulfilled!');
         console.log('groupData', groupData);
       } else {
-        Alert.alert(result1.payload?.error, result1.payload?.message);
         console.log('Group info fetching failed:', result1.payload);
       }
 
@@ -97,7 +96,6 @@ const Group = ({route, navigation}) => {
         console.log('Group members fetched fulfilled!');
         console.log('groupMembers', groupMembers);
       } else {
-        Alert.alert(result2.payload?.error, result2.payload?.message);
         console.log('Group members fetching failed:', result2.payload);
       }
     } catch (err) {

@@ -8,6 +8,8 @@ import expenseManagerSlice from '../slices/expenseManagerSlice';
 import balanceSlice from '../slices/balanceSlice';
 import groupManagerSlice from '../slices/groupManagerSlice';
 import paymentSlice from '../slices/paymentSlice';
+import upiSlice from '../slices/upiSlice';
+
 export const store = configureStore({
   reducer: {
     user: userReducer,
@@ -19,6 +21,7 @@ export const store = configureStore({
     expenseManager: expenseManagerSlice,
     balance: balanceSlice,
     payment: paymentSlice,
+    upi: upiSlice,
   },
 });
 

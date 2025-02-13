@@ -21,7 +21,8 @@ const TabsNavigator = () => {
         return {
           tabBarStyle: {
             backgroundColor: colors.primary, // Set your desired background color here
-            borderTopWidth: 0, // Optional: Remove the border if needed
+            borderTopWidth: 1, // Optional: Remove the border if needed
+            borderColor: colors.header,
           },
           tabBarIcon: ({focused, color, size}) => {
             let iconName;

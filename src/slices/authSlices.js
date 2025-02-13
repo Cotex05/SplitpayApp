@@ -2,6 +2,8 @@ import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {showToastWithGravity} from '../components/native/AndroidComponents';
 import AxiosInstance from '../api/AxiosInstance';
+import {Buffer} from 'buffer';
+import {APP_NAME} from '../constants/names';
 
 // Async Thunk for User Sign Up (POST Request)
 export const userSignUp = createAsyncThunk(
@@ -45,14 +47,28 @@ export const userPersist = createAsyncThunk(
     try {
       const jsonValue = await AsyncStorage.getItem('authUser');
       const userData = jsonValue != null ? JSON.parse(jsonValue) : null;
-      console.log('get userData', userData);
-      if (userData) {
-        return userData;
-      } else {
-        throw new Error('Auto authentication failed!');
+      const jwtToken = userData?.jwtToken;
+      if (!jsonValue) {
+        throw new Error(`Login to ${APP_NAME}`);
       }
+      const parts = jwtToken
+        .split('.')
+        .map(part =>
+          Buffer.from(
+            part.replace(/-/g, '+').replace(/_/g, '/'),
+            'base64',
+          ).toString(),
+        );
+      const payload = JSON.parse(parts[1]);
+      console.log('payload', payload);
+      if (payload.exp * 1000 < Date.now()) {
+        await AsyncStorage.removeItem('authUser');
+        throw new Error('Session Expire: Please login!');
+      }
+      console.log('userData', userData);
+      return userData;
     } catch (error) {
-      showToastWithGravity('Error: ' + error?.message);
+      showToastWithGravity(error?.message);
       return rejectWithValue(
         error.response ? error.response.data : error.message,
       );
@@ -116,6 +132,8 @@ const authSlice = createSlice({
       })
       .addCase(userPersist.rejected, (state, action) => {
         state.loading = false;
+        state.isAuthenticated = false;
+        state.user = null;
         state.error = null;
       });
   },

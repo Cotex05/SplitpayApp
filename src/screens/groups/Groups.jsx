@@ -140,7 +140,6 @@ const Groups = ({navigation}) => {
         console.log('User groups fetched fulfilled!');
         console.log('groups', groups);
       } else {
-        Alert.alert(result.payload?.error, result.payload?.message);
         console.log('User groups fetching failed:', result.payload);
       }
     } catch (err) {

@@ -11,6 +11,7 @@ import MainNavigator from './MainNavigator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {userPersist} from '../slices/authSlices';
 import LoadingBox from '../components/LoadingBox';
+import {setNavigator} from './NavigationService';
 
 const Stack = createNativeStackNavigator();
 
@@ -23,13 +24,20 @@ function AppNavigator() {
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
+  const handleUserPersistence = async () => {
     dispatch(userPersist());
+  };
+
+  useEffect(() => {
+    handleUserPersistence();
   }, []);
 
   return (
     <Suspense fallback={<LoadingBox />}>
-      <NavigationContainer>
+      <NavigationContainer
+        ref={navigatorRef => {
+          setNavigator(navigatorRef);
+        }}>
         {isAuthenticated ? (
           <Stack.Navigator screenOptions={{headerShown: false}}>
             <Stack.Screen name="MainNavigator" component={MainNavigator} />

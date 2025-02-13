@@ -123,7 +123,6 @@ const BalanceGraph = ({route, navigation}) => {
         console.log('Group balanceGraph fetched fulfilled!');
         console.log('BalanceGraph ', balanceGraph);
       } else {
-        Alert.alert(result.payload?.error, result.payload?.message);
         console.log('BalanceGraph fetching failed:', result.payload);
       }
     } catch (error) {

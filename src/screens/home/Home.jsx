@@ -2,6 +2,7 @@
 import React, {useEffect} from 'react';
 import {
   Alert,
+  Dimensions,
   Image,
   RefreshControl,
   SafeAreaView,
@@ -21,6 +22,7 @@ import currency from '../../constants/currency';
 import {APP_NAME} from '../../constants/names';
 import GlobalStyle from '../../styles/GlobalStyle';
 import {fetchUserExpenseStats} from '../../slices/expenseSlice';
+import ExpenseChart from './components/ExpenseChart';
 
 const Home = ({navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -49,7 +51,6 @@ const Home = ({navigation}) => {
       if (fetchUserExpenseStats.fulfilled.match(result)) {
         console.log('User Expense stats fetched fulfilled!');
       } else {
-        Alert.alert(result.payload?.error, result.payload?.message);
         console.log('Expense stats fetching failed:', result.payload);
       }
     } catch (error) {
@@ -65,46 +66,43 @@ const Home = ({navigation}) => {
   }, []);
 
   return (
-    <ScrollView>
-      <SafeAreaView style={{backgroundColor: colors.background, flex: 1}}>
-        <StatusBar
-          barStyle={'light-content'}
-          backgroundColor={colors.primary}
-        />
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            backgroundColor: colors.primary,
-            alignItems: 'center',
-            height: 60,
-          }}>
-          <View>
-            <Text
-              style={{
-                paddingHorizontal: 10,
-                fontFamily: 'monospace',
-                color: colors.header,
-                fontWeight: 'bold',
-                letterSpacing: 1,
-                fontSize: 32,
-                marginLeft: 10,
-              }}>
-              {APP_NAME}
-            </Text>
-          </View>
-          <TouchableOpacity style={{padding: 5, marginHorizontal: 10}}>
-            <Ionicons
-              name="notifications-outline"
-              color={colors.header}
-              size={25}
-            />
-          </TouchableOpacity>
+    <SafeAreaView style={{backgroundColor: colors.background, flex: 1}}>
+      <StatusBar barStyle={'light-content'} backgroundColor={colors.primary} />
+      <View
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          backgroundColor: colors.primary,
+          alignItems: 'center',
+          height: 60,
+        }}>
+        <View>
+          <Text
+            style={{
+              paddingHorizontal: 10,
+              fontFamily: 'monospace',
+              color: colors.header,
+              fontWeight: 'bold',
+              letterSpacing: 1,
+              fontSize: 32,
+              marginLeft: 10,
+            }}>
+            {APP_NAME}
+          </Text>
         </View>
+        <TouchableOpacity style={{padding: 5, marginHorizontal: 10}}>
+          <Ionicons
+            name="notifications-outline"
+            color={colors.header}
+            size={25}
+          />
+        </TouchableOpacity>
+      </View>
+      <ScrollView style={{backgroundColor: colors.primary}}>
         <View
           style={{
-            backgroundColor: colors.primary,
+            // backgroundColor: colors.primary,
             paddingHorizontal: 10,
           }}>
           <View>
@@ -230,8 +228,11 @@ const Home = ({navigation}) => {
             </View>
           </View>
         </View>
-      </SafeAreaView>
-    </ScrollView>
+        <View style={{marginTop: 12}}>
+          <ExpenseChart />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
