@@ -23,27 +23,6 @@ import {fetchExpenseCashFlow} from '../../../slices/expenseSlice';
 import {fetchGroupMembers} from '../../../slices/groupInfoSlice';
 import {fetchUserGroupBalanceGraph} from '../../../slices/balanceSlice';
 
-const sampleMembers = [
-  {
-    name: 'Mike Guth',
-    username: 'mike_guth',
-    amount: 50,
-    owed: false,
-  },
-  {
-    name: 'Mark',
-    username: 'mark',
-    amount: 50,
-    owed: false,
-  },
-  {
-    name: 'Tyson',
-    username: 'tyson',
-    amount: 25,
-    owed: true,
-  },
-];
-
 const MemberList = ({data, cashFlow, navigationData}) => {
   const navigation = useNavigation();
   const isDarkMode = useColorScheme() === 'dark';
@@ -52,8 +31,8 @@ const MemberList = ({data, cashFlow, navigationData}) => {
 
   const handleMemberPress = () => {
     const title = 'Balance';
-    const oweMessage = `You owe ${currency.symbol}${data?.amount} to ${data?.payee?.username}`;
-    const message = `${data?.payer?.username} owe you ${currency.symbol}${data?.amount}`;
+    const oweMessage = `You owe ${currency.symbol}${data?.amount} to ${data?.payee?.fullName}`;
+    const message = `${data?.payer?.fullName} owe you ${currency.symbol}${data?.amount}`;
     if (cashFlow == 'OUT') {
       showToastWithGravity(oweMessage);
     } else {
@@ -100,8 +79,8 @@ const MemberList = ({data, cashFlow, navigationData}) => {
                 fontSize: 18,
               }}>
               {cashFlow == 'OUT'
-                ? data?.payee?.username
-                : data?.payer?.username}
+                ? data?.payee?.fullName
+                : data?.payer?.fullName}
             </Text>
             <Text
               style={{

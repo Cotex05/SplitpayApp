@@ -4,6 +4,7 @@ import React, {Suspense, useEffect, useRef} from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Dimensions,
   SafeAreaView,
   Share,
   StatusBar,
@@ -24,10 +25,14 @@ import {useDispatch, useSelector} from 'react-redux';
 import {fetchGroupInfo, fetchGroupMembers} from '../../slices/groupInfoSlice';
 import LoadingBox from '../../components/LoadingBox';
 import {APP_NAME} from '../../constants/names';
+import OverviewRoute from './routes/OverviewRoute';
+import ExpensesRoute from './routes/ExpensesRoute';
+import SettlementsRoute from './routes/SettementsRoute';
 
-const SettlementsRoute = React.lazy(() => import('./routes/SettementsRoute'));
-const ExpensesRoute = React.lazy(() => import('./routes/ExpensesRoute'));
-const OverviewRoute = React.lazy(() => import('./routes/OverviewRoute'));
+// To optimize for faster loading
+// const SettlementsRoute = React.lazy(() => import('./routes/SettementsRoute'));
+// const ExpensesRoute = React.lazy(() => import('./routes/ExpensesRoute'));
+// const OverviewRoute = React.lazy(() => import('./routes/OverviewRoute'));
 
 const routes = [
   {key: 'first', title: 'Overview'},
@@ -143,7 +148,7 @@ const Group = ({route, navigation}) => {
             <View style={GlobalStyle.justifyCenterRow}>
               <TouchableOpacity
                 onPress={() => navigation.goBack()}
-                style={{paddingVertical: 5, marginRight: 10}}>
+                style={{paddingVertical: 5, marginRight: 5, maxWidth: 20}}>
                 <Ionicons
                   name="chevron-back-outline"
                   color={colors.header}
@@ -152,11 +157,12 @@ const Group = ({route, navigation}) => {
               </TouchableOpacity>
               <Text
                 style={{
-                  marginHorizontal: 20,
+                  marginHorizontal: 10,
                   color: colors.header,
-                  fontSize: 30,
+                  fontSize: 24,
                   fontWeight: 'bold',
                   textAlign: 'center',
+                  maxWidth: Dimensions.get('screen').width * 0.7,
                 }}>
                 {data?.groupName}
               </Text>
@@ -192,7 +198,7 @@ const Group = ({route, navigation}) => {
                   },
                 ]}
                 shouldOpenOnLongPress={false}>
-                <TouchableOpacity>
+                <TouchableOpacity style={{minWidth: 30}}>
                   <Ionicons
                     name="ellipsis-vertical"
                     color={colors.header}

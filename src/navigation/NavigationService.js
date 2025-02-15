@@ -6,12 +6,12 @@ export function setNavigator(ref) {
   navigator = ref;
 }
 
-export function navigateToLogin() {
-  console.log('Going back to login screen!');
+export function navigateToSignin() {
+  console.log('Going back to signin screen!');
   navigator.dispatch(
     CommonActions.reset({
       index: 0,
-      routes: [{name: 'Login'}],
+      routes: [{name: 'Signin'}],
     }),
   );
 }

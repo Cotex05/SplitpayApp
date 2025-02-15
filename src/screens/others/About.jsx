@@ -66,26 +66,6 @@ const About = ({navigation}) => {
             to be on design, not content.
           </Text>
         </View>
-        <View
-          style={{
-            marginVertical: 60,
-            display: 'flex',
-            alignItems: 'center',
-          }}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={{
-              width: 100,
-              height: 60,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <Text
-              style={{color: colors.muted, fontWeight: 'bold', fontSize: 25}}>
-              Close
-            </Text>
-          </TouchableOpacity>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );

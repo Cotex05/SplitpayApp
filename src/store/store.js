@@ -9,6 +9,7 @@ import balanceSlice from '../slices/balanceSlice';
 import groupManagerSlice from '../slices/groupManagerSlice';
 import paymentSlice from '../slices/paymentSlice';
 import upiSlice from '../slices/upiSlice';
+import statsSlice from '../slices/statsSlice';
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
     balance: balanceSlice,
     payment: paymentSlice,
     upi: upiSlice,
+    stats: statsSlice,
   },
 });
 

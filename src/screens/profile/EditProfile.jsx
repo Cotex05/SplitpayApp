@@ -16,6 +16,7 @@ import {darkColors, lightColors} from '../../constants/colors';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
 import {AccentActionButton} from '../../components/Buttons';
+import {images} from '../../constants/images';
 
 const EditProfile = ({route, navigation}) => {
   const [name, setName] = useState('');
@@ -32,7 +33,7 @@ const EditProfile = ({route, navigation}) => {
   useEffect(() => {
     setUsername(userData?.username);
     setEmail(userData?.email);
-    setName(userData?.username);
+    setName(userData?.fullName);
   }, []);
 
   return (
@@ -91,7 +92,9 @@ const EditProfile = ({route, navigation}) => {
                 borderRadius: 50,
               }}
               source={{
-                uri: 'https://w7.pngwing.com/pngs/81/570/png-transparent-profile-logo-computer-icons-user-user-blue-heroes-logo-thumbnail.png',
+                uri: userData?.photoUrl
+                  ? userData.photoUrl
+                  : images.DEFAULT_PROFILE_PHOTO,
               }}
             />
           </View>
@@ -154,7 +157,7 @@ const EditProfile = ({route, navigation}) => {
               borderWidth: 2,
               padding: 10,
               borderColor: colors.muted,
-              color: colors.text,
+              color: colors.muted,
               fontSize: 18,
               fontWeight: 500,
             }}

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {API_BASE_URL} from '@env';
 import {showToastWithGravity} from '../components/native/AndroidComponents';
-import {navigateToLogin} from '../navigation/NavigationService';
+import {navigateToSignin} from '../navigation/NavigationService';
 
 // Base URL for backend
 const BASE_URL = API_BASE_URL;
@@ -44,7 +44,7 @@ AxiosInstance.interceptors.response.use(
       let errorMessage = error.response?.data?.message;
 
       if (error.response.status == 401) {
-        navigateToLogin();
+        navigateToSignin();
       }
 
       if (!errorMessage) {

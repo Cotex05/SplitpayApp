@@ -115,7 +115,7 @@ const ExpenseList = ({data}) => {
                 fontWeight: 'bold',
                 fontSize: 15,
               }}>
-              {data?.paidBy?.username}
+              {data?.paidBy?.fullName}
             </Text>
           </View>
         </View>
@@ -134,7 +134,6 @@ const ExpenseList = ({data}) => {
               display: 'flex',
               color: 'gray',
               fontWeight: 300,
-              paddingVertical: 5,
               fontSize: 12,
             }}>
             {new Date(data?.createdAt).toLocaleDateString('en-GB')}

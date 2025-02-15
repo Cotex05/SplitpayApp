@@ -14,8 +14,12 @@ import {createPayment, fetchUserPaymentsInGroup} from '../slices/paymentSlice';
 import ModalStyle from '../styles/ModalStyle';
 import {ErrorActionButton, SuccessActionButton} from './Buttons';
 import {fetchUserGroupBalanceGraph} from '../slices/balanceSlice';
-import {fetchExpenseCashFlow} from '../slices/expenseSlice';
+import {
+  fetchExpenseCashFlow,
+  fetchUserExpenseStats,
+} from '../slices/expenseSlice';
 import {showToastWithGravity} from './native/AndroidComponents';
+import {fetchUserWeeklyExpenseStats} from '../slices/statsSlice';
 
 const BottomModal = ({modalVisible, setModalVisible, data, groupData}) => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -59,6 +63,8 @@ const BottomModal = ({modalVisible, setModalVisible, data, groupData}) => {
     dispatch(fetchUserGroupBalanceGraph(groupData?.groupId));
     dispatch(fetchExpenseCashFlow(groupData?.groupId));
     dispatch(fetchUserPaymentsInGroup(groupData?.groupId));
+    dispatch(fetchUserWeeklyExpenseStats());
+    dispatch(fetchUserExpenseStats());
     setModalVisible(false);
     setPaymentProcessing(false);
   };
@@ -130,8 +136,9 @@ const BottomModal = ({modalVisible, setModalVisible, data, groupData}) => {
                   <Text style={{color: colors.tertiary, fontSize: 30}}>
                     {currency.symbol}
                     {data?.amount}{' '}
-                  </Text>{' '}
-                  to {data?.payee?.username}
+                  </Text>
+                  {' to \n'}
+                  {data?.payee?.fullName}
                 </Text>
               </View>
               <SuccessActionButton

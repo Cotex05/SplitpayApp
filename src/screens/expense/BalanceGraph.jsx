@@ -32,8 +32,8 @@ const BalanceList = ({data, cashFlow, groupData}) => {
       setModalVisible(true);
       return;
     }
-    const title = `${data?.payer?.username} owe you`;
-    const message = `Ask ${data?.payer?.username} to pay you ${currency.symbol}${data.amount} to settle up.`;
+    const title = `${data?.payer?.fullName} owe you`;
+    const message = `Ask ${data?.payer?.fullName} to pay you ${currency.symbol}${data.amount} to settle up.`;
     Alert.alert(title, message);
   };
 
@@ -57,12 +57,19 @@ const BalanceList = ({data, cashFlow, groupData}) => {
             <Text
               style={{
                 color: colors.text,
-                fontSize: 20,
+                fontSize: 16,
                 fontWeight: 400,
+                maxWidth: Dimensions.get('screen').width * 0.25,
+                textAlign: 'center',
               }}>
-              {data?.payer?.username}
+              {data?.payer?.fullName}
             </Text>
-            <View style={{marginHorizontal: 20}}>
+            <View
+              style={{
+                marginHorizontal: 10,
+                maxWidth: 30,
+                textAlign: 'center',
+              }}>
               <Ionicons
                 name={'arrow-forward'}
                 size={30}
@@ -72,19 +79,23 @@ const BalanceList = ({data, cashFlow, groupData}) => {
             <Text
               style={{
                 color: colors.text,
-                fontSize: 20,
+                fontSize: 16,
                 fontWeight: 400,
+                maxWidth: Dimensions.get('screen').width * 0.25,
+                textAlign: 'center',
               }}>
-              {data?.payee?.username}
+              {data?.payee?.fullName}
             </Text>
           </View>
           <View>
             <Text
               style={{
                 color: colors.text,
-                fontSize: 20,
+                fontSize: 18,
                 color: cashFlow == 'IN' ? colors.green : colors.red,
                 fontWeight: 500,
+                maxWidth: Dimensions.get('screen').width * 0.3,
+                textAlign: 'auto',
               }}>
               {currency.symbol}
               {data?.amount}

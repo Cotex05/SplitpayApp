@@ -1,36 +1,32 @@
 /* eslint-disable react-native/no-inline-styles */
+import React, {useRef, useState} from 'react';
 import {
-  View,
-  Text,
-  useColorScheme,
-  SafeAreaView,
-  StatusBar,
-  Dimensions,
-  TouchableOpacity,
-  TextInput,
-  Keyboard,
-  TouchableWithoutFeedback,
-  ScrollView,
-  Image,
-  Alert,
   ActivityIndicator,
+  Alert,
+  Dimensions,
+  Image,
   KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  useColorScheme,
+  View,
 } from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
-import {darkColors, lightColors} from '../../constants/colors';
-import GlobalStyle from '../../styles/GlobalStyle';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {AccentActionButton} from '../../components/Buttons';
-import {useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
+import {AccentActionButton} from '../../components/Buttons';
+import {showToastWithGravity} from '../../components/native/AndroidComponents';
+import {darkColors, lightColors} from '../../constants/colors';
 import {
   addMultipleMembersToGroup,
   createGroup,
 } from '../../slices/groupManagerSlice';
 import {clearSearchUsers, searchUsers} from '../../slices/userSlices';
-import {showToastWithGravity} from '../../components/native/AndroidComponents';
-import {userGroups} from '../../slices/groupSlice';
+import GlobalStyle from '../../styles/GlobalStyle';
 
 const UserList = ({data, handleUserRemove}) => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -243,7 +239,6 @@ const GroupManager = ({route, navigation}) => {
       console.log('Result from addMembersToGroup', resultAction);
       if (addMultipleMembersToGroup.fulfilled.match(resultAction)) {
         console.log(`Group members added!`);
-        dispatch(userGroups());
       } else {
         console.log('Failed to add members in group:', resultAction.payload);
       }

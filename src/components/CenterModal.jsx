@@ -66,6 +66,7 @@ const CenterModalCreateGroup = ({modalVisible, setModalVisible}) => {
                 fontSize: 20,
                 fontWeight: 500,
               }}
+              maxLength={20}
               autoFocus={true}
               placeholder="Group name"
               placeholderTextColor={colors.muted}

@@ -1,22 +1,22 @@
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
 import {useColorScheme} from 'react-native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import EditProfile from '../screens/profile/EditProfile';
-import Profile from '../screens/profile/Profile';
 import {darkColors, lightColors} from '../constants/colors';
-import Groups from '../screens/groups/Groups';
-import Group from '../screens/groups/Group';
+import RegisterUserDetails from '../screens/auth/others/RegisterUserDetails';
+import SigninScreen from '../screens/auth/signin/Signin';
+import BalanceGraph from '../screens/expense/BalanceGraph';
 import Expense from '../screens/expense/Expense';
 import ExpenseManager from '../screens/expense/ExpenseManager';
-import TabsNavigator from './TabsNavigator';
-import MyUPIsScreen from '../screens/profile/routes/MyUPIs';
+import Group from '../screens/groups/Group';
 import ManageGroup from '../screens/groups/GroupManager';
-import SettledTransaction from '../screens/settlement/SettledTransaction';
-import Support from '../screens/others/Support';
+import Groups from '../screens/groups/Groups';
 import About from '../screens/others/About';
-import BalanceGraph from '../screens/expense/BalanceGraph';
-import RegisterScreen from '../screens/auth/register/Register';
-import LoginScreen from '../screens/auth/login/Login';
+import Support from '../screens/others/Support';
+import EditProfile from '../screens/profile/EditProfile';
+import Profile from '../screens/profile/Profile';
+import MyUPIsScreen from '../screens/profile/routes/MyUPIs';
+import SettledTransaction from '../screens/settlement/SettledTransaction';
+import TabsNavigator from './TabsNavigator';
 
 const Stack = createNativeStackNavigator();
 
@@ -46,8 +46,11 @@ function MainNavigator() {
       <Stack.Screen name="About" component={About} />
       <Stack.Screen name="Support" component={Support} />
       <Stack.Screen name="BalanceGraph" component={BalanceGraph} />
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen name="Signin" component={SigninScreen} />
+      <Stack.Screen
+        name="RegisterUserDetails"
+        component={RegisterUserDetails}
+      />
     </Stack.Navigator>
   );
 }

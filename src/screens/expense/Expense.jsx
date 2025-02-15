@@ -33,10 +33,10 @@ const ExpenseList = ({title, value}) => {
   const showExpenseShareMembers = () => {
     let members = '';
     value.forEach(share => {
-      members += share?.user?.username + ', ';
+      members += share?.user?.fullName + ', ';
     });
     members = members.slice(0, members.length - 2);
-    Alert.alert('Expense for: ', members);
+    Alert.alert('Expense includes ', members);
   };
 
   return (
@@ -130,7 +130,7 @@ const Expense = ({route, navigation}) => {
 
     {
       title: 'Paid By',
-      value: data?.paidBy?.username,
+      value: data?.paidBy?.fullName,
     },
 
     {

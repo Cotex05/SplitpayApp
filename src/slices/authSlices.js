@@ -4,13 +4,14 @@ import {showToastWithGravity} from '../components/native/AndroidComponents';
 import AxiosInstance from '../api/AxiosInstance';
 import {Buffer} from 'buffer';
 import {APP_NAME} from '../constants/names';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
 
 // Async Thunk for User Sign Up (POST Request)
 export const userSignUp = createAsyncThunk(
   'auth/userSignUp',
-  async (userData, {rejectWithValue}) => {
+  async (signUpRequest, {rejectWithValue}) => {
     try {
-      const response = await AxiosInstance.post(`/auth/signup`, userData);
+      const response = await AxiosInstance.post(`/auth/signup`, signUpRequest);
       console.log('Signup response: ', response);
       return response.data; // API response (success message or user data)
     } catch (error) {
@@ -25,14 +26,49 @@ export const userSignUp = createAsyncThunk(
 // ✅ Async Thunk for User Login (POST Request)
 export const userLogin = createAsyncThunk(
   'auth/userLogin',
-  async (loginData, {rejectWithValue}) => {
+  async (loginRequest, {rejectWithValue}) => {
     try {
-      const response = await AxiosInstance.post(`/auth/signin`, loginData);
+      const response = await AxiosInstance.post(`/auth/signin`, loginRequest);
       console.log('Login response: ', response);
       return response.data; // Returns user data (e.g., token, user details)
     } catch (error) {
       console.log(error);
       showToastWithGravity('Error: ' + error?.message);
+      return rejectWithValue(
+        error.response ? error.response.data : error.message,
+      );
+    }
+  },
+);
+
+// ✅ Async Thunk for User Signout (POST Request)
+export const userSignout = createAsyncThunk(
+  'auth/userSignout',
+  async (_, {rejectWithValue}) => {
+    try {
+      const response = await AxiosInstance.post(`/auth/signout`);
+      console.log('Signout response: ', response);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      showToastWithGravity('Error: ' + error?.message);
+      return rejectWithValue(
+        error.response ? error.response.data : error.message,
+      );
+    }
+  },
+);
+
+// ✅ Async Thunk for user existence through email (POST Request)
+export const fetchUserExistStatus = createAsyncThunk(
+  'auth/verify',
+  async (email, {rejectWithValue}) => {
+    try {
+      const response = await AxiosInstance.get(`/auth/verify?email=${email}`);
+      console.log('Verify response: ', response);
+      return response.data;
+    } catch (error) {
+      console.log(error);
       return rejectWithValue(
         error.response ? error.response.data : error.message,
       );
@@ -63,6 +99,7 @@ export const userPersist = createAsyncThunk(
       console.log('payload', payload);
       if (payload.exp * 1000 < Date.now()) {
         await AsyncStorage.removeItem('authUser');
+        await GoogleSignin.signOut();
         throw new Error('Session Expire: Please login!');
       }
       console.log('userData', userData);
@@ -80,6 +117,7 @@ export const userPersist = createAsyncThunk(
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
+    response: null,
     isAuthenticated: false,
     user: null,
     loading: false,
@@ -110,11 +148,28 @@ const authSlice = createSlice({
       })
       .addCase(userLogin.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload; // Assuming API returns user object
+        state.user = action.payload;
         state.isAuthenticated = true;
         state.successMessage = 'Login successful!';
       })
       .addCase(userLogin.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message;
+      })
+
+      // Signout Cases
+      .addCase(userSignout.pending, state => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(userSignout.fulfilled, (state, action) => {
+        state.loading = false;
+        state.response = action.payload;
+        state.isAuthenticated = false;
+        state.user = null;
+        state.successMessage = 'Signout successful!';
+      })
+      .addCase(userSignout.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message;
       })
@@ -134,6 +189,21 @@ const authSlice = createSlice({
         state.loading = false;
         state.isAuthenticated = false;
         state.user = null;
+        state.error = null;
+      })
+
+      // Verify by email
+      .addCase(fetchUserExistStatus.pending, state => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserExistStatus.fulfilled, (state, action) => {
+        state.loading = false;
+        state.response = action.payload;
+        state.successMessage = 'Verification completed!';
+      })
+      .addCase(fetchUserExistStatus.rejected, (state, action) => {
+        state.loading = false;
         state.error = null;
       });
   },

@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useRef, useState} from 'react';
 import {
+  ActivityIndicator,
   Alert,
   Image,
   Pressable,
@@ -131,6 +132,8 @@ const Groups = ({navigation}) => {
     state => state.group,
   );
 
+  const {group} = useSelector(state => state.groupManager);
+
   const fetchGroups = async () => {
     try {
       const result = await dispatch(userGroups());
@@ -149,7 +152,7 @@ const Groups = ({navigation}) => {
 
   useEffect(() => {
     fetchGroups();
-  }, []);
+  }, [group]);
 
   return (
     <SafeAreaView style={{backgroundColor: colors.background, flex: 1}}>
@@ -213,6 +216,19 @@ const Groups = ({navigation}) => {
         </View>
       </View>
       <ScrollView>
+        {loading ? (
+          <ActivityIndicator size="large" color={colors.tertiary} />
+        ) : groups.length == 0 ? (
+          <Text
+            style={{
+              color: colors.muted,
+              fontSize: 18,
+              padding: 12,
+              alignSelf: 'center',
+            }}>
+            No groups yet!
+          </Text>
+        ) : null}
         {groups.map((item, index) => {
           return <GroupList data={item} key={index} />;
         })}

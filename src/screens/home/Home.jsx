@@ -1,10 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect} from 'react';
 import {
-  Alert,
-  Dimensions,
   Image,
-  RefreshControl,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -14,15 +11,17 @@ import {
   View,
 } from 'react-native';
 
-import {useNavigation} from '@react-navigation/native';
+import ContentLoader from 'react-content-loader/native';
+import {Circle, Rect} from 'react-native-svg';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useDispatch, useSelector} from 'react-redux';
 import {darkColors, lightColors} from '../../constants/colors';
 import currency from '../../constants/currency';
 import {APP_NAME} from '../../constants/names';
-import GlobalStyle from '../../styles/GlobalStyle';
 import {fetchUserExpenseStats} from '../../slices/expenseSlice';
+import GlobalStyle from '../../styles/GlobalStyle';
 import ExpenseChart from './components/ExpenseChart';
+import {images} from '../../constants/images';
 
 const Home = ({navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -41,7 +40,9 @@ const Home = ({navigation}) => {
 
   const user = useSelector(state => state.auth.user);
 
-  const {expenseStats} = useSelector(state => state.expense);
+  const {expenseStats, expenseLoading, expenseError} = useSelector(
+    state => state.expense,
+  );
 
   const getUserExpenseStats = async () => {
     try {
@@ -102,7 +103,6 @@ const Home = ({navigation}) => {
       <ScrollView style={{backgroundColor: colors.primary}}>
         <View
           style={{
-            // backgroundColor: colors.primary,
             paddingHorizontal: 10,
           }}>
           <View>
@@ -122,7 +122,7 @@ const Home = ({navigation}) => {
                     fontWeight: 700,
                     color: colors.tertiary,
                   }}>
-                  {user?.username}
+                  {user?.fullName}
                 </Text>
               </View>
               <View>
@@ -139,7 +139,9 @@ const Home = ({navigation}) => {
                     borderColor: colors.tertiary,
                   }}
                   source={{
-                    uri: 'https://t4.ftcdn.net/jpg/03/64/21/11/360_F_364211147_1qgLVxv1Tcq0Ohz3FawUfrtONzz8nq3e.jpg',
+                    uri: user?.photoUrl
+                      ? user.photoUrl
+                      : images.DEFAULT_PROFILE_PHOTO,
                   }}
                 />
               </View>
@@ -150,82 +152,123 @@ const Home = ({navigation}) => {
               {marginHorizontal: 10, paddingBottom: 10},
               GlobalStyle.justifyBetweenRow,
             ]}>
-            <View
-              style={{
-                backgroundColor: 'rgba(0,0,0,0.2)',
-                height: 140,
-                width: 140,
-                margin: 5,
-                borderWidth: 5,
-                paddingTop: 5,
-                borderColor: colors.tertiary,
-                borderRadius: '50%',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <Text
+            {expenseLoading ? (
+              <ContentLoader
+                speed={1}
+                width={140}
+                height={140}
                 style={{
-                  color: colors.white,
-                  fontWeight: 800,
-                  fontSize: 22,
-                  letterSpacing: 1,
-                }}>
-                {currency.symbol}
-                {expenseStats?.totalAmountSpent}
-              </Text>
-              <Text
+                  margin: 5,
+                  paddingTop: 5,
+                }}
+                backgroundColor={colors.primary}
+                foregroundColor={colors.tertiary}>
+                <Circle cx="70" cy="70" r="70" />
+              </ContentLoader>
+            ) : (
+              <View
                 style={{
-                  color: colors.header,
-                  fontSize: 14,
-                  fontFamily: 'sans-serif',
-                  marginTop: 5,
+                  backgroundColor: 'rgba(0,0,0,0.2)',
+                  height: 140,
+                  width: 140,
+                  margin: 5,
+                  borderWidth: 5,
+                  paddingTop: 5,
+                  borderColor: colors.tertiary,
+                  borderRadius: '50%',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}>
-                Spent by you
-              </Text>
-            </View>
-            <View
-              style={{
-                marginHorizontal: 10,
-                justifyContent: 'space-around',
-                alignItems: 'flex-start',
-                height: 120,
-                padding: 10,
-              }}>
-              <Text
-                style={{
-                  color: colors.white,
-                  fontSize: 22,
-                  fontWeight: 600,
-                  letterSpacing: 1,
-                  textDecorationLine: 'underline',
-                }}>
-                Final Balance
-              </Text>
-              <View style={GlobalStyle.justifyBetweenRow}>
                 <Text
-                  style={{color: colors.header, fontSize: 20, fontWeight: 400}}>
-                  Recieve{' '}
+                  style={{
+                    color: colors.white,
+                    fontWeight: 800,
+                    fontSize: 22,
+                    letterSpacing: 1,
+                  }}>
+                  {currency.symbol}
+                  {expenseStats?.totalAmountSpent}
                 </Text>
                 <Text
                   style={{
-                    color: colors.tertiary,
+                    color: colors.header,
+                    fontSize: 14,
+                    fontFamily: 'sans-serif',
+                    marginTop: 5,
+                  }}>
+                  Spent by you
+                </Text>
+              </View>
+            )}
+            {expenseLoading ? (
+              <ContentLoader
+                speed={1}
+                width={120}
+                height={120}
+                style={{
+                  marginHorizontal: 10,
+                  alignItems: 'flex-start',
+                  padding: 10,
+                }}
+                backgroundColor={colors.primary}
+                foregroundColor={colors.tertiary}>
+                <Rect x="0" y="0" rx="10" ry="10" width="100%" height="30" />
+                <Rect x="0" y="40" rx="10" ry="10" width="80%" height="20" />
+                <Rect x="0" y="70" rx="10" ry="10" width="80%" height="20" />
+              </ContentLoader>
+            ) : (
+              <View
+                style={{
+                  marginHorizontal: 10,
+                  justifyContent: 'space-around',
+                  alignItems: 'flex-start',
+                  height: 120,
+                  padding: 10,
+                }}>
+                <Text
+                  style={{
+                    color: colors.white,
                     fontSize: 20,
                     fontWeight: 600,
+                    letterSpacing: 1,
+                    textDecorationLine: 'underline',
                   }}>
-                  {currency.symbol} {expenseStats?.totalAmountIn}
+                  Final Balance
                 </Text>
+                <View style={GlobalStyle.justifyBetweenRow}>
+                  <Text
+                    style={{
+                      color: colors.header,
+                      fontSize: 18,
+                      fontWeight: 400,
+                    }}>
+                    Recieve{' '}
+                  </Text>
+                  <Text
+                    style={{
+                      color: colors.tertiary,
+                      fontSize: 16,
+                      fontWeight: 600,
+                    }}>
+                    {currency.symbol} {expenseStats?.totalAmountIn}
+                  </Text>
+                </View>
+                <View style={GlobalStyle.justifyBetweenRow}>
+                  <Text
+                    style={{
+                      color: colors.header,
+                      fontSize: 18,
+                      fontWeight: 400,
+                    }}>
+                    To Pay{'   '}
+                  </Text>
+                  <Text
+                    style={{color: colors.red, fontSize: 16, fontWeight: 600}}>
+                    {currency.symbol} {expenseStats?.totalAmountOut}
+                  </Text>
+                </View>
               </View>
-              <View style={GlobalStyle.justifyBetweenRow}>
-                <Text
-                  style={{color: colors.header, fontSize: 20, fontWeight: 400}}>
-                  To Pay{'   '}
-                </Text>
-                <Text
-                  style={{color: colors.red, fontSize: 20, fontWeight: 600}}>
-                  {currency.symbol} {expenseStats?.totalAmountOut}
-                </Text>
-              </View>
-            </View>
+            )}
           </View>
         </View>
         <View style={{marginTop: 12}}>

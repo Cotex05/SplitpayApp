@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
   Dimensions,
   Keyboard,
   StatusBar,
@@ -26,6 +27,7 @@ const MyUPIsScreen = ({route, navigation}) => {
   const colors = isDarkMode ? darkColors : lightColors;
 
   const [primaryUPI, setPrimaryUPI] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const {userData} = route.params;
 
@@ -37,6 +39,7 @@ const MyUPIsScreen = ({route, navigation}) => {
 
   const getUserUpiAddress = async () => {
     try {
+      setLoading(true);
       const result = await dispatch(fetchUserUpi(userData?.username));
 
       console.log('Result from getUserUpiAddress', result);
@@ -49,6 +52,8 @@ const MyUPIsScreen = ({route, navigation}) => {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -106,7 +111,7 @@ const MyUPIsScreen = ({route, navigation}) => {
                   fontWeight: 'bold',
                   textAlign: 'center',
                 }}>
-                My UPIs
+                UPI Address
               </Text>
             </View>
             <View>
@@ -120,55 +125,61 @@ const MyUPIsScreen = ({route, navigation}) => {
             </View>
           </View>
         </View>
-        <View
-          style={{
-            margin: 12,
-          }}>
-          <Text
-            style={{
-              padding: 5,
-              color: colors.text,
-              fontSize: 20,
-              fontWeight: 600,
-            }}>
-            Primary UPI Id
-          </Text>
-          <TextInput
-            style={{
-              height: 50,
-              width: Dimensions.get('screen').width - 40,
-              borderRadius: 10,
-              borderWidth: 2,
-              padding: 10,
-              borderColor: colors.muted,
-              color: colors.text,
-              fontSize: 18,
-              fontWeight: 500,
-            }}
-            placeholderTextColor={colors.muted}
-            onChangeText={setPrimaryUPI}
-            placeholder="Enter UPI"
-            value={primaryUPI}
-            keyboardType="email-address"
-          />
-          <Text style={{color: colors.muted, padding: 2}}>
-            You will receive the payment in this UPI Id
-          </Text>
-        </View>
+        {loading ? (
+          <ActivityIndicator color={colors.tertiary} size="large" />
+        ) : (
+          <>
+            <View
+              style={{
+                margin: 12,
+              }}>
+              <Text
+                style={{
+                  padding: 5,
+                  color: colors.text,
+                  fontSize: 20,
+                  fontWeight: 600,
+                }}>
+                Primary UPI Id
+              </Text>
+              <TextInput
+                style={{
+                  height: 50,
+                  width: Dimensions.get('screen').width - 40,
+                  borderRadius: 10,
+                  borderWidth: 2,
+                  padding: 10,
+                  borderColor: colors.muted,
+                  color: colors.text,
+                  fontSize: 18,
+                  fontWeight: 500,
+                }}
+                placeholderTextColor={colors.muted}
+                onChangeText={setPrimaryUPI}
+                placeholder="Enter UPI"
+                value={primaryUPI}
+                keyboardType="email-address"
+              />
+              <Text style={{color: colors.muted, padding: 2}}>
+                You will receive the payment in this UPI Id
+              </Text>
+            </View>
 
-        <View
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: 20,
-            margin: 10,
-          }}>
-          <AccentActionButton
-            title="Save"
-            onPress={handleUpiSave}
-            loading={upiLoading}
-          />
-        </View>
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: 20,
+                margin: 10,
+              }}>
+              <AccentActionButton
+                title="Save"
+                onPress={handleUpiSave}
+                loading={upiLoading}
+              />
+            </View>
+          </>
+        )}
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );

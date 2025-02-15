@@ -9,15 +9,21 @@ import {
   TouchableOpacity,
   Image,
   Share,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {darkColors, lightColors} from '../../constants/colors';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
 import {APP_NAME} from '../../constants/names';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {showToastWithGravity} from '../../components/native/AndroidComponents';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {userSignout} from '../../slices/authSlices';
+import {LoadingModalBox} from '../../components/LoadingBox';
+import {images} from '../../constants/images';
 
 const Profile = () => {
   const navigation = useNavigation();
@@ -26,12 +32,16 @@ const Profile = () => {
 
   const colors = isDarkMode ? darkColors : lightColors;
 
-  const user = useSelector(state => state.auth.user);
+  const [signOutModalVisible, setSignOutModalVisible] = useState(false);
+
+  const dispatch = useDispatch();
+
+  const {loading, error, user} = useSelector(state => state.auth);
 
   const onShare = async () => {
     try {
       const result = await Share.share({
-        message: `Invite people or friends to ${APP_NAME}`,
+        message: `Invite people or friends to join ${APP_NAME}`,
       });
       if (result.action === Share.sharedAction) {
         if (result.activityType) {
@@ -47,17 +57,38 @@ const Profile = () => {
     }
   };
 
-  const handleLogout = async () => {
+  const processLogout = async () => {
     try {
+      setSignOutModalVisible(true);
+      await GoogleSignin.signOut();
       await AsyncStorage.removeItem('authUser');
+      const signoutResponse = await dispatch(userSignout());
+      console.log(signoutResponse);
       showToastWithGravity(`Logout from ${APP_NAME}`);
       navigation.reset({
         index: 0,
-        routes: [{name: 'Login'}],
+        routes: [{name: 'Signin'}],
       });
     } catch (error) {
       console.log(error);
+    } finally {
+      setSignOutModalVisible(true);
     }
+  };
+
+  const handleSignOut = () => {
+    Alert.alert(
+      `Logout from ${APP_NAME}`,
+      'Do you want to logout now?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {text: 'Confirm', onPress: processLogout},
+      ],
+      {cancelable: false},
+    );
   };
 
   return (
@@ -100,7 +131,9 @@ const Profile = () => {
                 borderRadius: 50,
               }}
               source={{
-                uri: 'https://w7.pngwing.com/pngs/81/570/png-transparent-profile-logo-computer-icons-user-user-blue-heroes-logo-thumbnail.png',
+                uri: user?.photoUrl
+                  ? user.photoUrl
+                  : images.DEFAULT_PROFILE_PHOTO,
               }}
             />
             <View
@@ -111,12 +144,12 @@ const Profile = () => {
               <Text
                 style={{
                   color: colors.white,
-                  fontSize: 25,
+                  fontSize: 20,
                   fontWeight: 600,
                   textAlign: 'center',
-                  marginLeft: 20,
+                  marginLeft: 10,
                 }}>
-                {user?.username}
+                {user?.fullName}
               </Text>
               <Text
                 style={{
@@ -125,7 +158,7 @@ const Profile = () => {
                   fontSize: 15,
                   fontWeight: 500,
                   textAlign: 'center',
-                  marginLeft: 20,
+                  marginLeft: 12,
                 }}>
                 @{user?.username}
               </Text>
@@ -163,7 +196,8 @@ const Profile = () => {
           borderColor: colors.muted,
           borderRadius: 15,
         }}>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('EditProfile', {userData: user})}>
           <View
             style={{
               display: 'flex',
@@ -175,7 +209,7 @@ const Profile = () => {
               borderBottomColor: colors.muted,
             }}>
             <Text style={{color: colors.dark, fontWeight: 600, fontSize: 18}}>
-              Manage password
+              Edit Profile
             </Text>
             <View>
               <Ionicons
@@ -199,7 +233,7 @@ const Profile = () => {
               borderBottomColor: colors.muted,
             }}>
             <Text style={{color: colors.dark, fontWeight: 600, fontSize: 18}}>
-              My UPIs
+              Manage UPI Address
             </Text>
             <View>
               <Ionicons
@@ -222,7 +256,7 @@ const Profile = () => {
               borderBottomColor: colors.muted,
             }}>
             <Text style={{color: colors.dark, fontWeight: 600, fontSize: 18}}>
-              Invite
+              Invite Others
             </Text>
             <View>
               <Ionicons
@@ -279,7 +313,7 @@ const Profile = () => {
             </View>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleLogout}>
+        <TouchableOpacity onPress={handleSignOut}>
           <View
             style={{
               display: 'flex',
@@ -292,15 +326,24 @@ const Profile = () => {
               Logout
             </Text>
             <View>
-              <Ionicons
-                name="chevron-forward-outline"
-                color={colors.muted}
-                size={25}
-              />
+              {loading ? (
+                <ActivityIndicator size="large" color={colors.tertiary} />
+              ) : (
+                <Ionicons
+                  name="chevron-forward-outline"
+                  color={colors.muted}
+                  size={25}
+                />
+              )}
             </View>
           </View>
         </TouchableOpacity>
       </View>
+      <LoadingModalBox
+        message="Signing out..."
+        setModalVisible={setSignOutModalVisible}
+        modalVisible={signOutModalVisible}
+      />
     </SafeAreaView>
   );
 };

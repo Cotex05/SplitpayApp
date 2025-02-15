@@ -41,12 +41,13 @@ const TabsNavigator = () => {
           tabBarActiveTintColor: colors.tertiary,
           tabBarInactiveTintColor: colors.header,
           headerShown: false, // Optional: Hide header
+          keyboardHidesTabBar: true, // Hides tab bar when keyboard is open
         };
       }}>
       <Tab.Screen name="Home" component={Home} />
       <Tab.Screen
         name="Groups"
-        options={{tabBarLabel: 'Groups'}}
+        options={{tabBarLabel: 'Groups', tabBarHideOnKeyboard: true}}
         component={Groups}
       />
       <Tab.Screen

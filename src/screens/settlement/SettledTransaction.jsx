@@ -54,7 +54,7 @@ const SettledTransaction = ({route, navigation}) => {
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-around',
-            padding: 20,
+            padding: 10,
             marginTop: 10,
             alignItems: 'center',
             maxWidth: Dimensions.get('window').width,
@@ -62,12 +62,14 @@ const SettledTransaction = ({route, navigation}) => {
           <Text
             style={{
               color: colors.white,
-              fontSize: 25,
+              fontSize: 20,
               fontWeight: 400,
+              textAlign: 'center',
+              width: Dimensions.get('window').width * 0.3,
             }}>
-            {cashFlow == 'IN' ? data?.payer?.username : 'You'}
+            {cashFlow == 'IN' ? data?.payer?.fullName : 'You'}
           </Text>
-          <View>
+          <View style={{width: 40}}>
             <Ionicons
               name={'arrow-forward'}
               size={40}
@@ -78,10 +80,12 @@ const SettledTransaction = ({route, navigation}) => {
           <Text
             style={{
               color: colors.white,
-              fontSize: 25,
+              fontSize: 20,
               fontWeight: 400,
+              textAlign: 'center',
+              width: Dimensions.get('window').width * 0.3,
             }}>
-            {cashFlow == 'IN' ? 'You' : data?.payee?.username}
+            {cashFlow == 'IN' ? 'You' : data?.payee?.fullName}
           </Text>
         </View>
       </View>

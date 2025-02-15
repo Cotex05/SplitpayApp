@@ -29,6 +29,7 @@ import {
 } from '../../slices/expenseSlice';
 import GlobalStyle from '../../styles/GlobalStyle';
 import {fetchUserGroupBalanceGraph} from '../../slices/balanceSlice';
+import {fetchUserWeeklyExpenseStats} from '../../slices/statsSlice';
 
 const ExpenseManager = ({route, navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -121,22 +122,58 @@ const ExpenseManager = ({route, navigation}) => {
           barStyle={'light-content'}
           backgroundColor={colors.primary}
         />
-        <View style={{padding: 20, backgroundColor: colors.primary}}>
+        <View style={{padding: 10, backgroundColor: colors.primary}}>
           <View style={GlobalStyle.justifyBetweenRow}>
-            <Text
-              style={{
-                marginHorizontal: 20,
-                color: colors.header,
-                fontSize: 30,
-                fontWeight: 'bold',
-                textAlign: 'center',
-              }}>
-              Add Expense
-            </Text>
+            <View style={GlobalStyle.justifyCenterRow}>
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                style={{paddingVertical: 5, marginRight: 5, maxWidth: 20}}>
+                <Ionicons
+                  name="chevron-back-outline"
+                  color={colors.header}
+                  size={30}
+                />
+              </TouchableOpacity>
+              <Text
+                style={{
+                  marginHorizontal: 20,
+                  color: colors.header,
+                  fontSize: 25,
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                }}>
+                Add Expense
+              </Text>
+            </View>
             <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={{paddingVertical: 5, marginRight: 10}}>
-              <Ionicons name="close" color={colors.header} size={30} />
+              onPress={handleAddExpense}
+              style={{
+                minWidth: 80,
+                paddingVertical: 5,
+                marginRight: 10,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}>
+              {expenseSaving ? (
+                <>
+                  <ActivityIndicator color={colors.tertiary} size="large" />
+                  <Text style={{color: colors.tertiary, fontSize: 20}}>
+                    Saving
+                  </Text>
+                </>
+              ) : (
+                <>
+                  <Ionicons
+                    name="save-outline"
+                    color={colors.tertiary}
+                    size={30}
+                  />
+                  <Text style={{color: colors.tertiary, fontSize: 20}}>
+                    Save
+                  </Text>
+                </>
+              )}
             </TouchableOpacity>
           </View>
           <View
@@ -144,7 +181,7 @@ const ExpenseManager = ({route, navigation}) => {
               display: 'flex',
               flexDirection: 'row',
               padding: 5,
-              marginTop: 20,
+              marginTop: 10,
               alignItems: 'center',
               justifyContent: 'center',
               maxWidth: Dimensions.get('window').width,
@@ -295,13 +332,8 @@ const ExpenseManager = ({route, navigation}) => {
             alignItems: 'center',
           }}>
           <MutedActionButton
-            title="Close"
+            title="Cancel"
             onPress={() => navigation.goBack()}
-          />
-          <AccentActionButton
-            title="Save"
-            loading={expenseSaving}
-            onPress={handleAddExpense}
           />
         </View>
       </SafeAreaView>

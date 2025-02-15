@@ -87,7 +87,7 @@ const TransactionList = ({data, currUser}) => {
                 fontWeight: 'bold',
                 fontSize: 18,
               }}>
-              {cashFlow == 'IN' ? data?.payer?.username : data?.payee?.username}
+              {cashFlow == 'IN' ? data?.payer?.fullName : data?.payee?.fullName}
             </Text>
             <Text
               style={{
