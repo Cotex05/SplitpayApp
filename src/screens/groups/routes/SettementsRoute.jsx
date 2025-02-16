@@ -2,6 +2,7 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect} from 'react';
 import {
+  RefreshControl,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -13,30 +14,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import currency from '../../../constants/currency';
 import {useDispatch, useSelector} from 'react-redux';
 import {fetchUserPaymentsInGroup} from '../../../slices/paymentSlice';
-
-const sampleTransactions = [
-  {
-    payer: 'Mike',
-    payee: 'John',
-    amount: 120,
-    date: '20/01/2025',
-    cashFlow: 'IN',
-  },
-  {
-    payer: 'John',
-    payee: 'Mark',
-    amount: 95,
-    date: '21/01/2025',
-    cashFlow: 'OUT',
-  },
-  {
-    payer: 'Tyson',
-    payee: 'John',
-    amount: 20,
-    date: '20/01/2025',
-    cashFlow: 'IN',
-  },
-];
 
 const TransactionList = ({data, currUser}) => {
   const navigation = useNavigation();
@@ -126,6 +103,14 @@ const SettlementsRoute = ({data}) => {
 
   const colors = isDarkMode ? darkColors : lightColors;
 
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    await getUserPayementsInGroup();
+    setRefreshing(false);
+  }, []);
+
   const dispatch = useDispatch();
   const {payments, paymentLoading, paymentError, paymentSuccessMessage} =
     useSelector(state => state.payment);
@@ -152,7 +137,10 @@ const SettlementsRoute = ({data}) => {
   }, []);
 
   return (
-    <View>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }>
       <View
         display="flex"
         flexDirection="row"
@@ -185,7 +173,7 @@ const SettlementsRoute = ({data}) => {
           return <TransactionList data={item} currUser={user} key={index} />;
         })}
       </ScrollView>
-    </View>
+    </ScrollView>
   );
 };
 

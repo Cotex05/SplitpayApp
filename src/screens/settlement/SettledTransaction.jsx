@@ -137,7 +137,7 @@ const SettledTransaction = ({route, navigation}) => {
           Paid By
         </Text>
         <Text style={{color: colors.dark, fontWeight: 600, fontSize: 20}}>
-          {cashFlow == 'IN' ? data?.payer?.username : 'You'}
+          {cashFlow == 'IN' ? data?.payer?.fullName : 'You'}
         </Text>
       </View>
       <View

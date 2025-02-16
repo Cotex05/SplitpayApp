@@ -1,27 +1,26 @@
-import {
-  View,
-  Text,
-  StatusBar,
-  useColorScheme,
-  StyleSheet,
-  Image,
-  Dimensions,
-  TouchableOpacity,
-  ActivityIndicator,
-} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {APP_NAME} from '../../../constants/names';
+import {OAUTH_GOOGLE_WEB_CLIENT_ID} from '@env';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   GoogleSignin,
   GoogleSigninButton,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
-import {darkColors, lightColors} from '../../../constants/colors';
+import React, {useEffect} from 'react';
+import {
+  ActivityIndicator,
+  Dimensions,
+  Image,
+  StatusBar,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  View,
+} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
-import {fetchUserExistStatus, userLogin} from '../../../slices/authSlices';
 import {showToastWithGravity} from '../../../components/native/AndroidComponents';
-import {OAUTH_GOOGLE_WEB_CLIENT_ID} from '@env';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {darkColors, lightColors} from '../../../constants/colors';
+import {APP_NAME} from '../../../constants/names';
+import {fetchUserExistStatus, userLogin} from '../../../slices/authSlices';
 
 const SigninScreen = ({navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -163,7 +162,7 @@ const SigninScreen = ({navigation}) => {
             <ActivityIndicator size="large" color={colors.tertiary} />
           ) : (
             <GoogleSigninButton
-              style={{width: 200, height: 50}}
+              style={{width: 225, height: 50}}
               size={GoogleSigninButton.Size.Wide}
               color={GoogleSigninButton.Color.Dark}
               onPress={handleGoogleSignIn}

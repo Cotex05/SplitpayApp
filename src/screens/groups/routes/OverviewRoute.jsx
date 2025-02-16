@@ -129,7 +129,6 @@ const OverviewRoute = ({data}) => {
     await getExpenseCashFlow();
     await getUserGroupBalanceGraph();
     setRefreshing(false);
-    showToastWithGravity('Refreshed!');
   }, []);
 
   const dispatch = useDispatch();

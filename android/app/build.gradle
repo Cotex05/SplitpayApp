@@ -73,6 +73,17 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'org.webkit:android-jsc:+'
 
+def readInput(prompt) {
+    if (System.console()) {
+        // Use System.console() if available
+        return System.console().readLine(prompt)
+    } else {
+        // Fallback for environments where System.console() is null
+        println(prompt)
+        return new BufferedReader(new InputStreamReader(System.in)).readLine()
+    }
+}
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -93,18 +104,31 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            storeFile file("my-release-key.keystore")
+            storePassword readInput("\nKeystore password: ")
+            keyAlias readInput("\nKey alias: ")
+            keyPassword readInput("\nKey password: ")
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
+        // release {
+        //     // Caution! In production, you need to generate your own keystore file.
+        //     // see https://reactnative.dev/docs/signed-apk-android.
+        //     signingConfig signingConfigs.debug
+        //     minifyEnabled enableProguardInReleaseBuilds
+        //     proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        // }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        
     }
 }
 

@@ -105,12 +105,6 @@ const Expense = ({route, navigation}) => {
         showToastWithGravity('Expense removed!');
         navigation.goBack();
       } else {
-        Alert.alert(
-          result.payload?.error
-            ? result.payload?.error
-            : "Can't remove expense!",
-          result.payload?.message,
-        );
         console.log('Expense removing failed:', result.payload);
       }
     } catch (error) {
@@ -118,7 +112,11 @@ const Expense = ({route, navigation}) => {
     }
   };
 
-  const sampleDetails = [
+  const DetailsList = [
+    {
+      title: 'Category',
+      value: `${data?.category ? data?.category : 'Others'}`,
+    },
     {
       title: 'Amount',
       value: `${currency.symbol} ${data?.amount}`,
@@ -239,7 +237,7 @@ const Expense = ({route, navigation}) => {
           </Text>
         </View>
       </View>
-      {sampleDetails.map((item, ind) => {
+      {DetailsList.map((item, ind) => {
         return <ExpenseList key={ind} title={item.title} value={item.value} />;
       })}
       <View

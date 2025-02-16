@@ -55,7 +55,9 @@ const GroupList = ({data}) => {
               alignSelf: 'center',
               borderRadius: 50,
             }}
-            source={require('../../assets/images/defaultGroupProfile.png')}
+            source={{
+              uri: 'https://i.ibb.co/SX3BBmP7/default-Group-Profile.webp',
+            }}
           />
           <View
             style={{

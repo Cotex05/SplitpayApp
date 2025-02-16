@@ -3,7 +3,6 @@ import {useNavigation} from '@react-navigation/native';
 import React, {useEffect} from 'react';
 import {
   ActivityIndicator,
-  Alert,
   RefreshControl,
   ScrollView,
   Text,
@@ -13,55 +12,9 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useDispatch, useSelector} from 'react-redux';
-import {showToastWithGravity} from '../../../components/native/AndroidComponents';
 import {darkColors, lightColors} from '../../../constants/colors';
 import currency from '../../../constants/currency';
 import {fetchGroupExpenses} from '../../../slices/expenseSlice';
-
-const sampleExpenses = [
-  {
-    title: 'Icecream',
-    paidBy: 'Mark',
-    amount: 300,
-    paidFor: 'All',
-    date: '17/01/2025',
-  },
-  {
-    title: 'Biryani',
-    paidBy: 'John Doe',
-    amount: 600,
-    paidFor: 'All',
-    date: '18/01/2025',
-  },
-  {
-    title: 'Pizza',
-    paidBy: 'Mark',
-    amount: 900,
-    paidFor: 'All',
-    date: '14/01/2025',
-  },
-  {
-    title: 'Juice',
-    paidBy: 'Mike',
-    amount: 150,
-    paidFor: 'All',
-    date: '19/01/2025',
-  },
-  {
-    title: 'Dinner at restaurant',
-    paidBy: 'Mike',
-    amount: 1200,
-    paidFor: 'All',
-    date: '22/01/2025',
-  },
-  {
-    title: 'Coke',
-    paidBy: 'Mark',
-    amount: 110,
-    paidFor: 'All',
-    date: '18/01/2025',
-  },
-];
 
 const ExpenseList = ({data}) => {
   const navigation = useNavigation();
@@ -157,7 +110,6 @@ const ExpensesRoute = ({data}) => {
     setRefreshing(true);
     await getGroupExpenses();
     setRefreshing(false);
-    showToastWithGravity('Refreshed!');
   }, []);
 
   const dispatch = useDispatch();
