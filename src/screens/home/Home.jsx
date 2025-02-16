@@ -17,11 +17,11 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useDispatch, useSelector} from 'react-redux';
 import {darkColors, lightColors} from '../../constants/colors';
 import currency from '../../constants/currency';
+import {images} from '../../constants/images';
 import {APP_NAME} from '../../constants/names';
 import {fetchUserExpenseStats} from '../../slices/expenseSlice';
 import GlobalStyle from '../../styles/GlobalStyle';
 import ExpenseChart from './components/ExpenseChart';
-import {images} from '../../constants/images';
 
 const Home = ({navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';

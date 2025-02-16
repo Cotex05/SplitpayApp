@@ -17,6 +17,7 @@ import Profile from '../screens/profile/Profile';
 import MyUPIsScreen from '../screens/profile/routes/MyUPIs';
 import SettledTransaction from '../screens/settlement/SettledTransaction';
 import TabsNavigator from './TabsNavigator';
+import GroupMembers from '../screens/groups/routes/GroupMembers';
 
 const Stack = createNativeStackNavigator();
 
@@ -34,6 +35,7 @@ function MainNavigator() {
       <Stack.Screen name="EditProfile" component={EditProfile} />
       <Stack.Screen name="Groups" component={Groups} />
       <Stack.Screen name="Group" component={Group} />
+      <Stack.Screen name="GroupMembers" component={GroupMembers} />
       <Stack.Screen name="ManageGroup" component={ManageGroup} />
       <Stack.Screen name="Expense" component={Expense} />
       <Stack.Screen

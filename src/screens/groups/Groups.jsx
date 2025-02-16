@@ -55,9 +55,7 @@ const GroupList = ({data}) => {
               alignSelf: 'center',
               borderRadius: 50,
             }}
-            source={{
-              uri: 'https://cdn.pixabay.com/photo/2016/11/14/17/39/group-1824145_1280.png',
-            }}
+            source={require('../../assets/images/defaultGroupProfile.png')}
           />
           <View
             style={{
@@ -80,7 +78,7 @@ const GroupList = ({data}) => {
                 fontWeight: 'bold',
                 fontSize: 12,
               }}>
-              {new Date(data?.createdAt).toLocaleDateString('en-GB')}
+              @{data?.createdBy?.username}
             </Text>
           </View>
         </View>
@@ -88,20 +86,20 @@ const GroupList = ({data}) => {
           style={{
             display: 'flex',
             justifyContent: 'center',
-            alignItems: 'center',
+            alignItems: 'flex-end',
             padding: 2,
-            width: 50,
+            width: 100,
             height: 30,
             borderRadius: 20,
-            backgroundColor: colors.header,
           }}>
           <Text
             style={{
-              color: colors.success,
+              color: colors.muted,
               fontWeight: 600,
-              fontSize: 16,
+              fontSize: 12,
+              textAlign: 'center',
             }}>
-            New
+            {new Date(data?.createdAt).toLocaleDateString('en-GB')}
           </Text>
         </View>
       </View>
@@ -118,10 +116,6 @@ const Groups = ({navigation}) => {
   const [joinGroupModalVisible, setJoinGroupModalVisible] = useState(false);
 
   const menuRef = useRef(null);
-
-  const handleMenuClose = () => {
-    console.log('pop menu closed!');
-  };
 
   const handleGroupJoin = async () => {
     setJoinGroupModalVisible(true);
@@ -188,19 +182,12 @@ const Groups = ({navigation}) => {
             onPressAction={({nativeEvent}) => {
               if (nativeEvent.event == 'join') {
                 handleGroupJoin();
-              } else if (nativeEvent.event == 'close') {
-                handleMenuClose();
               }
             }}
             actions={[
               {
                 id: 'join',
                 title: 'Join group',
-                titleColor: colors.text,
-              },
-              {
-                id: 'close',
-                title: 'Close',
                 titleColor: colors.text,
               },
             ]}

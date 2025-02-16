@@ -63,7 +63,10 @@ const MemberList = ({data, cashFlow, navigationData}) => {
               borderRadius: 50,
             }}
             source={{
-              uri: 'https://w7.pngwing.com/pngs/81/570/png-transparent-profile-logo-computer-icons-user-user-blue-heroes-logo-thumbnail.png',
+              uri:
+                cashFlow == 'OUT'
+                  ? data?.payee?.photoUrl
+                  : data?.payer?.photoUrl,
             }}
           />
           <View

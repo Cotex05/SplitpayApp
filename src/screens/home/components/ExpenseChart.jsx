@@ -67,7 +67,7 @@ const ExpenseChart = () => {
           padding: 5,
           marginHorizontal: 10,
         }}>
-        Weekly Expenses
+        This Week Expenses
       </Text>
       {statsLoading ? (
         <View style={{alignItems: 'center', marginVertical: 10}}>
@@ -89,7 +89,7 @@ const ExpenseChart = () => {
               padding: 12,
               alignSelf: 'center',
             }}>
-            No data for last week
+            No data for this week
           </Text>
         </View>
       ) : (
@@ -102,10 +102,12 @@ const ExpenseChart = () => {
               },
             ],
           }}
+          fromZero={true}
           width={Dimensions.get('window').width * 0.9}
           height={220}
           yAxisLabel={currency.symbol}
           yAxisInterval={1} // optional, defaults to 1
+          formatYLabel={value => Math.round(value)}
           chartConfig={{
             backgroundColor: 'rgba(0,0,0,0.5)',
             backgroundGradientFrom: colors.secondary,

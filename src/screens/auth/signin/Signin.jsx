@@ -17,7 +17,6 @@ import {
   statusCodes,
 } from '@react-native-google-signin/google-signin';
 import {darkColors, lightColors} from '../../../constants/colors';
-import LoadingBox, {LoadingModalBox} from '../../../components/LoadingBox';
 import {useDispatch, useSelector} from 'react-redux';
 import {fetchUserExistStatus, userLogin} from '../../../slices/authSlices';
 import {showToastWithGravity} from '../../../components/native/AndroidComponents';
@@ -78,15 +77,22 @@ const SigninScreen = ({navigation}) => {
               userSigninData: userInfo,
             });
           }
+        } else {
+          showToastWithGravity('Server Error: Failed to login!');
+          console.log(resultAction.payload);
         }
+      } else {
+        showToastWithGravity(userInfo?.type);
       }
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         console.log('User cancelled the sign-in');
+        showToastWithGravity('Sign in cancelled!');
       } else if (error.code === statusCodes.IN_PROGRESS) {
         console.log('Sign in is in progress');
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         console.log('Play Services not available');
+        showToastWithGravity('Play Services not available!');
       } else {
         console.error('Sign in error:', error);
       }
@@ -132,7 +138,7 @@ const SigninScreen = ({navigation}) => {
         />
         <View style={{alignItems: 'center', padding: 10, margin: 10}}>
           <Image
-            source={{uri: 'https://i.ibb.co/1YwLtJfy/Splitpay-App-Logo.png'}}
+            source={require('../../../assets/images/AppLogo.png')}
             style={{width: 120, height: 120, borderRadius: 100}}
           />
         </View>

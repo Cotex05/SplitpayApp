@@ -18,9 +18,10 @@ import DatePicker from 'react-native-date-picker';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useDispatch, useSelector} from 'react-redux';
-import {AccentActionButton, MutedActionButton} from '../../components/Buttons';
 import {showToastWithGravity} from '../../components/native/AndroidComponents';
 import {darkColors, lightColors} from '../../constants/colors';
+import currency from '../../constants/currency';
+import {fetchUserGroupBalanceGraph} from '../../slices/balanceSlice';
 import {saveExpense} from '../../slices/expenseManagerSlice';
 import {
   fetchExpenseCashFlow,
@@ -28,8 +29,6 @@ import {
   fetchUserExpenseStats,
 } from '../../slices/expenseSlice';
 import GlobalStyle from '../../styles/GlobalStyle';
-import {fetchUserGroupBalanceGraph} from '../../slices/balanceSlice';
-import {fetchUserWeeklyExpenseStats} from '../../slices/statsSlice';
 
 const ExpenseManager = ({route, navigation}) => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -45,6 +44,33 @@ const ExpenseManager = ({route, navigation}) => {
 
   const [open, setOpen] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState([]);
+
+  const [openCategoryMenu, setOpenCategoryMenu] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('');
+
+  const categories = [
+    {label: 'Food', value: 'food'},
+
+    {label: 'Transportation', value: 'transportation'},
+
+    {label: 'Accommodation', value: 'accommodation'},
+
+    {label: 'Utilities', value: 'utilities'},
+
+    {label: 'Bills', value: 'bills'},
+
+    {label: 'Entertainment', value: 'entertainment'},
+
+    {label: 'Travel and Vacation', value: 'travel'},
+
+    {label: 'Shopping', value: 'shopping'},
+
+    {label: 'Health and Wellness', value: 'health'},
+
+    {label: 'Education', value: 'education'},
+
+    {label: 'Miscellaneous', value: 'miscellaneous'},
+  ];
 
   const [openDate, setOpenDate] = useState(false);
 
@@ -104,7 +130,7 @@ const ExpenseManager = ({route, navigation}) => {
     const people = [];
     groupMembers.map(member => {
       people.push({
-        label: member?.username,
+        label: member?.fullName,
         value: member?.userId,
       });
     });
@@ -226,7 +252,7 @@ const ExpenseManager = ({route, navigation}) => {
               }}
               placeholderTextColor={colors.muted}
               onChangeText={setAmount}
-              placeholder="Amount"
+              placeholder={`Amount (in ${currency.symbol})`}
               keyboardType="number-pad"
               value={amount}
               maxLength={10}
@@ -234,6 +260,46 @@ const ExpenseManager = ({route, navigation}) => {
             <Text style={{color: colors.muted, padding: 2}}>
               This amount will be splitted equally
             </Text>
+          </View>
+          <View
+            style={{
+              maxWidth: Dimensions.get('window').width * 0.9,
+            }}>
+            <Text
+              style={{
+                padding: 5,
+                color: colors.text,
+                fontSize: 20,
+                fontWeight: 600,
+              }}>
+              Category
+            </Text>
+            <DropDownPicker
+              style={{
+                borderRadius: 10,
+                borderWidth: 2,
+                borderColor: colors.muted,
+                color: colors.text,
+                fontSize: 18,
+                backgroundColor: colors.background,
+              }}
+              containerStyle={{
+                backgroundColor: colors.background,
+              }}
+              placeholder="Select category"
+              open={openCategoryMenu}
+              value={selectedCategory}
+              items={categories}
+              setOpen={setOpenCategoryMenu}
+              setValue={setSelectedCategory}
+              theme={isDarkMode ? 'DARK' : 'LIGHT'}
+              zIndex={999}
+              zIndexInverse={998}
+              listMode="SCROLLVIEW"
+              scrollViewProps={{
+                nestedScrollEnabled: true, // Enables nested scrolling
+              }}
+            />
           </View>
           <View
             style={{
@@ -270,6 +336,12 @@ const ExpenseManager = ({route, navigation}) => {
               theme={isDarkMode ? 'DARK' : 'LIGHT'}
               multiple={true}
               mode="BADGE"
+              zIndex={996}
+              zIndexInverse={997}
+              listMode="SCROLLVIEW"
+              scrollViewProps={{
+                nestedScrollEnabled: true, // Enables nested scrolling
+              }}
               badgeDotColors={[colors.secondary]}
             />
             <Text style={{color: colors.muted, padding: 2}}>
@@ -321,19 +393,6 @@ const ExpenseManager = ({route, navigation}) => {
             onCancel={() => {
               setOpenDate(false);
             }}
-          />
-        </View>
-        <View
-          style={{
-            marginVertical: 100,
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-around',
-            alignItems: 'center',
-          }}>
-          <MutedActionButton
-            title="Cancel"
-            onPress={() => navigation.goBack()}
           />
         </View>
       </SafeAreaView>

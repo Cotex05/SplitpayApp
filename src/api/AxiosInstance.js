@@ -1,10 +1,11 @@
 import axios from 'axios';
-import {API_BASE_URL} from '@env';
+import {API_BASE_URL_SERVER} from '@env';
 import {showToastWithGravity} from '../components/native/AndroidComponents';
 import {navigateToSignin} from '../navigation/NavigationService';
+import {Alert} from 'react-native';
 
 // Base URL for backend
-const BASE_URL = API_BASE_URL;
+const BASE_URL = API_BASE_URL_SERVER;
 
 // Create Axios instance
 const AxiosInstance = axios.create({
@@ -31,10 +32,32 @@ const AxiosInstance = axios.create({
 //   },
 // );
 
+// Request Interceptor
+AxiosInstance.interceptors.request.use(
+  config => {
+    // console.log('Request:', config);
+    return config;
+  },
+  error => {
+    return Promise.reject(error);
+  },
+);
+
 // Add a response interceptor to handle errors
 AxiosInstance.interceptors.response.use(
   response => response, // Pass through successful responses
   error => {
+    if (error.message === 'Network Error') {
+      Alert.alert(
+        'Network Error',
+        'An unexpected error occurred, unable to connect with server.',
+      );
+    } else if (error.code === 'ECONNABORTED') {
+      Alert.alert(
+        'Request Timed Out',
+        'The request took too long. Please try again later.',
+      );
+    }
     // Check if it's a server error
     if (error.response) {
       // Server responded with a status code out of 2xx range

@@ -52,8 +52,11 @@ const Group = ({route, navigation}) => {
 
   const menuRef = useRef(null);
 
-  const handleGroupClose = () => {
-    console.log('pop menu closed!');
+  const handleGroupMembers = () => {
+    navigation.navigate('GroupMembers', {
+      membersData: groupMembers,
+      groupData: data,
+    });
   };
 
   const handleGroupEdit = () => {};
@@ -157,7 +160,7 @@ const Group = ({route, navigation}) => {
               </TouchableOpacity>
               <Text
                 style={{
-                  marginHorizontal: 10,
+                  marginHorizontal: 20,
                   color: colors.header,
                   fontSize: 24,
                   fontWeight: 'bold',
@@ -172,15 +175,20 @@ const Group = ({route, navigation}) => {
                 ref={menuRef}
                 title="Menu"
                 onPressAction={({nativeEvent}) => {
-                  if (nativeEvent.event == 'invite') {
+                  if (nativeEvent.event == 'members') {
+                    handleGroupMembers();
+                  } else if (nativeEvent.event == 'invite') {
                     handleGroupInvite();
                   } else if (nativeEvent.event == 'edit') {
                     handleGroupEdit();
-                  } else if (nativeEvent.event == 'close') {
-                    handleGroupClose();
                   }
                 }}
                 actions={[
+                  {
+                    id: 'members',
+                    title: 'Members',
+                    titleColor: colors.text,
+                  },
                   {
                     id: 'invite',
                     title: 'Invite',
@@ -189,12 +197,7 @@ const Group = ({route, navigation}) => {
                   {
                     id: 'edit',
                     title: 'Edit group',
-                    titleColor: colors.text,
-                  },
-                  {
-                    id: 'close',
-                    title: 'Close',
-                    titleColor: colors.text,
+                    titleColor: colors.muted,
                   },
                 ]}
                 shouldOpenOnLongPress={false}>

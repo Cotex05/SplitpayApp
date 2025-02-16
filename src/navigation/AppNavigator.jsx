@@ -1,7 +1,7 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React, {Suspense, useEffect} from 'react';
-import {useColorScheme} from 'react-native';
+import {Image, Text, useColorScheme, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import LoadingBox from '../components/LoadingBox';
 import {darkColors, lightColors} from '../constants/colors';
@@ -10,6 +10,7 @@ import SigninScreen from '../screens/auth/signin/Signin';
 import {userPersist} from '../slices/authSlices';
 import MainNavigator from './MainNavigator';
 import {setNavigator} from './NavigationService';
+import NetInfo from '@react-native-community/netinfo';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,6 +21,8 @@ function AppNavigator() {
 
   const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
 
+  const [isOffline, setIsOffline] = React.useState(false);
+
   const dispatch = useDispatch();
 
   const handleUserPersistence = async () => {
@@ -28,7 +31,36 @@ function AppNavigator() {
 
   useEffect(() => {
     handleUserPersistence();
+    const unsubscribe = NetInfo.addEventListener(state => {
+      setIsOffline(!state.isConnected);
+    });
+
+    // Cleanup the event listener
+    return () => unsubscribe();
   }, []);
+
+  if (isOffline) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: colors.background,
+        }}>
+        <View style={{alignItems: 'center', padding: 10, margin: 10}}>
+          <Image
+            source={require('../assets/images/AppLogo.png')}
+            style={{width: 120, height: 120, borderRadius: 100}}
+          />
+        </View>
+        <Text style={{color: colors.red, fontSize: 22, fontWeight: 600}}>
+          {' '}
+          No internet! You are Offline.
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <Suspense fallback={<LoadingBox />}>

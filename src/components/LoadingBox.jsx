@@ -68,7 +68,7 @@ const LoadingModalBox = ({
             <ActivityIndicator size="large" color={colors.tertiary} />
             <Text
               style={{
-                color: colors.text,
+                color: colors.white,
                 fontSize: 18,
                 fontWeight: 500,
                 padding: 20,
