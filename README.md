@@ -1,97 +1,129 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# React Native App Guide
 
-# Getting Started
+## Prerequisites
+- Node.js (v14 or newer)
+- npm or yarn
+- React Native CLI (`npm install -g react-native-cli`)
+- Android Studio (for Android) or Xcode (for iOS)
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Installation
 
-## Step 1: Start Metro
+1. Clone this repository:
+   ```bash
+   git clone [repository-url]
+   ```
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+2. Navigate to the project directory:
+   ```bash
+   cd [project-folder]
+   ```
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+3. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
 
-```sh
-# Using npm
-npm start
-
-# OR using Yarn
-yarn start
-```
-
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+## Running the App
 
 ### Android
+```bash
+# Start Metro bundler
+npm start
 
-```sh
-# Using npm
+# In a new terminal
 npm run android
-
-# OR using Yarn
-yarn android
 ```
 
 ### iOS
+```bash
+# Start Metro bundler
+npm start
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
+# In a new terminal
 npm run ios
-
-# OR using Yarn
-yarn ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+## Troubleshooting
+- If you encounter issues, try:
+  ```bash
+  cd android && ./gradlew clean && cd ..
+  npm start -- --reset-cache
+  ```
+- Make sure your emulator is running before starting the app
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+## Additional Commands
+- Run tests: `npm test`
+- Lint code: `npm run lint`
 
-## Step 3: Modify your app
+# App Preview
 
-Now that you have successfully run the app, let's make changes!
+<div style="display: flex; flex-wrap: wrap; gap: 16px; justify-content: center;">
+  <!-- Row 1 -->
+  <div style="flex: 1 1 300%; min-width: 250px;">
+    <img src="https://github.com/user-attachments/assets/3286e976-52f2-49f3-a37e-3345df59bf9f" alt="Home" style="width: 40%; border-radius: 8px;">
+    <p style="text-align: center; margin-top: 8px;">Home</p>
+  </div>
+  <div style="flex: 1 1 30%; min-width: 250px;">
+    <img src="https://github.com/user-attachments/assets/68d5d7ec-7f20-4959-9904-d64c6d2e9efd" alt="Overview" style="width: 40%; border-radius: 8px;">
+    <p style="text-align: center; margin-top: 8px;">Overview</p>
+  </div>
+  <div style="flex: 1 1 30%; min-width: 250px;">
+    <img src="https://github.com/user-attachments/assets/b92f7476-ad01-4479-9649-bf024ff895f4" alt="Balance_Graph" style="width: 40%; border-radius: 8px;">
+    <p style="text-align: center; margin-top: 8px;">Balance Graph</p>
+  </div>
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+  <!-- Row 2 -->
+  <div style="flex: 1 1 30%; min-width: 250px;">
+    <img src="https://github.com/user-attachments/assets/35e9497e-91c2-44b3-b980-fee6e9bfa084" alt="Expense" style="width: 40%; border-radius: 8px;">
+    <p style="text-align: center; margin-top: 8px;">Expense</p>
+  </div>
+  <div style="flex: 1 1 30%; min-width: 250px;">
+    <img src="https://github.com/user-attachments/assets/bc960e3c-71eb-44d3-9135-eb624d2b8caf" alt="Expenses" style="width: 40%; border-radius: 8px;">
+    <p style="text-align: center; margin-top: 8px;">Expenses</p>
+  </div>
+  <div style="flex: 1 1 30%; min-width: 250px;">
+    <img src="https://github.com/user-attachments/assets/388bc35a-0848-476a-81b1-7dde2fb6f8be" alt="Groups" style="width: 40%; border-radius: 8px;">
+    <p style="text-align: center; margin-top: 8px;">Groups</p>
+  </div>
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+  <!-- Row 3 -->
+  <div style="flex: 1 1 30%; min-width: 250px;">
+    <img src="https://github.com/user-attachments/assets/8749aa6d-32c5-45af-9d5a-8a84f05f59be" alt="MyProfile" style="width: 40%; border-radius: 8px;">
+    <p style="text-align: center; margin-top: 8px;">MyProfile</p>
+  </div>
+  <div style="flex: 1 1 30%; min-width: 250px;">
+    <img src="https://github.com/user-attachments/assets/e0d9d6da-8f76-4022-af3c-31cf3e52acae" alt="Settlements" style="width: 40%; border-radius: 8px;">
+    <p style="text-align: center; margin-top: 8px;">Settlements</p>
+  </div>
+  <div style="flex: 1 1 30%; min-width: 250px;">
+    <img src="https://github.com/user-attachments/assets/24087827-da00-4341-8e29-9fa87b8e911f" alt="Profile" style="width: 40%; border-radius: 8px;">
+    <p style="text-align: center; margin-top: 8px;">Profile</p>
+  </div>
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+  <!-- Row 4 -->
+  <div style="flex: 1 1 30%; min-width: 250px;">
+    <img src="https://github.com/user-attachments/assets/40ff6d84-7c80-465e-ae34-c57bae10324e" alt="Group_Members" style="width: 40%; border-radius: 8px;">
+    <p style="text-align: center; margin-top: 8px;">Group Members</p>
+  </div>
+  <div style="flex: 1 1 30%; min-width: 250px;">
+    <img src="https://github.com/user-attachments/assets/3228f3bd-7971-4fcc-aea9-21770adfe83f" alt="Create_Expense" style="width: 40%; border-radius: 8px;">
+    <p style="text-align: center; margin-top: 8px;">Create Expense</p>
+  </div>
+  <div style="flex: 1 1 30%; min-width: 250px;">
+    <img src="https://github.com/user-attachments/assets/5049d1a1-033a-49a7-a5da-16fc00c2abfc" alt="Create_Group" style="width: 40%; border-radius: 8px;">
+    <p style="text-align: center; margin-top: 8px;">Create Group</p>
+  </div>
 
-## Congratulations! :tada:
+  <!-- Row 5 -->
+  <div style="flex: 1 1 30%; min-width: 250px;">
+    <img src="https://github.com/user-attachments/assets/bf16a548-2cd3-488c-9f83-e026d49e76e9" alt="Join_Group" style="width: 40%; border-radius: 8px;">
+    <p style="text-align: center; margin-top: 8px;">Join Group</p>
+  </div>
+  <div style="flex: 1 1 30%; min-width: 250px;">
+    <img src="https://github.com/user-attachments/assets/e662edb7-9f9e-492b-86bb-b9dd86e4480f" alt="UPI" style="width: 40%; border-radius: 8px;">
+    <p style="text-align: center; margin-top: 8px;">UPI</p>
+  </div>
+</div>
 
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
