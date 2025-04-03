@@ -1,11 +1,11 @@
 import axios from 'axios';
-import {API_BASE_URL_SERVER} from '@env';
+import {API_BASE_URL_SERVER, API_BASE_URL} from '@env';
 import {showToastWithGravity} from '../components/native/AndroidComponents';
 import {navigateToSignin} from '../navigation/NavigationService';
 import {Alert} from 'react-native';
 
 // Base URL for backend
-const BASE_URL = API_BASE_URL_SERVER;
+const BASE_URL = 'http://192.168.1.5:7777/api'; // API_BASE_URL;
 
 // Create Axios instance
 const AxiosInstance = axios.create({
@@ -48,6 +48,7 @@ AxiosInstance.interceptors.response.use(
   response => response, // Pass through successful responses
   error => {
     if (error.message === 'Network Error') {
+      console.log('BASE_URL', BASE_URL);
       Alert.alert(
         'Network Error',
         'An unexpected error occurred, unable to connect with server.',

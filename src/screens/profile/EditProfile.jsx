@@ -1,22 +1,27 @@
 /* eslint-disable react-native/no-inline-styles */
-import {
-  View,
-  Text,
-  useColorScheme,
-  SafeAreaView,
-  StatusBar,
-  Dimensions,
-  TouchableOpacity,
-  Image,
-  TextInput,
-  ScrollView,
-} from 'react-native';
 import React, {useEffect, useState} from 'react';
-import {darkColors, lightColors} from '../../constants/colors';
+import {
+  Dimensions,
+  Image,
+  Keyboard,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {useNavigation} from '@react-navigation/native';
+import {useDispatch, useSelector} from 'react-redux';
 import {AccentActionButton} from '../../components/Buttons';
+import {showToastWithGravity} from '../../components/native/AndroidComponents';
+import {darkColors, lightColors} from '../../constants/colors';
 import {images} from '../../constants/images';
+import {saveProfile} from '../../slices/profileSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {userPersist} from '../../slices/authSlices';
 
 const EditProfile = ({route, navigation}) => {
   const [name, setName] = useState('');
@@ -30,6 +35,58 @@ const EditProfile = ({route, navigation}) => {
 
   const {userData} = route.params;
 
+  const dispatch = useDispatch();
+
+  const {profileData, profileLoading, profileError} = useSelector(
+    state => state.profile,
+  );
+
+  const updateInMemoryUserData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('authUser');
+      const userData = jsonValue != null ? JSON.parse(jsonValue) : null;
+      if (userData) {
+        userData.fullName = name;
+      }
+      await AsyncStorage.setItem('authUser', JSON.stringify(userData));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const updateUserProfile = async () => {
+    try {
+      const profileData = {
+        fullName: name,
+        username: username,
+        email: email,
+        phone: phoneNumber,
+      };
+      const result = await dispatch(saveProfile(profileData));
+
+      console.log('Result from updateUserProfile', result);
+      if (saveProfile.fulfilled.match(result)) {
+        console.log('Profile saving success!');
+        await updateInMemoryUserData();
+        dispatch(userPersist());
+        showToastWithGravity('Profile Saved!');
+        navigation.goBack();
+      } else {
+        console.log('Profile saving failed:', result.payload);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleProfileSave = () => {
+    if (name === '') {
+      showToastWithGravity('Fields cannot be empty!');
+      return;
+    }
+    Keyboard.dismiss();
+    updateUserProfile();
+  };
   useEffect(() => {
     setUsername(userData?.username);
     setEmail(userData?.email);
@@ -165,9 +222,10 @@ const EditProfile = ({route, navigation}) => {
             onChangeText={setEmail}
             placeholder="Email"
             value={email}
+            editable={false}
             keyboardType="email-address"
           />
-          <TextInput
+          {/* <TextInput
             style={{
               height: 50,
               margin: 12,
@@ -185,7 +243,7 @@ const EditProfile = ({route, navigation}) => {
             placeholder="Phone Number"
             value={phoneNumber}
             keyboardType="number-pad"
-          />
+          /> */}
         </View>
         <View
           style={{
@@ -195,7 +253,8 @@ const EditProfile = ({route, navigation}) => {
           }}>
           <AccentActionButton
             title="Save"
-            onPress={() => navigation.goBack()}
+            onPress={handleProfileSave}
+            loading={profileLoading}
           />
         </View>
       </ScrollView>

@@ -52,6 +52,7 @@ const groupSlice = createSlice({
     builder
       .addCase(userGroups.pending, state => {
         state.loading = true;
+        state.groups = [];
         state.error = null;
       })
       .addCase(userGroups.fulfilled, (state, action) => {

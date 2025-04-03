@@ -28,7 +28,7 @@ export const fetchGroupExpenses = createAsyncThunk(
       console.log('group id', groupId);
       const response = await AxiosInstance.get(`/expenses/groups/${groupId}`);
       console.log('Group expenses response: ', response);
-      return response.data;
+      return response.data?.content;
     } catch (error) {
       console.log(error);
       return rejectWithValue(
@@ -71,6 +71,7 @@ const expenseSlice = createSlice({
     builder
       .addCase(fetchExpenseCashFlow.pending, state => {
         state.expenseLoading = true;
+        state.cashflow = null;
         state.expenseError = null;
       })
       .addCase(fetchExpenseCashFlow.fulfilled, (state, action) => {
@@ -85,6 +86,7 @@ const expenseSlice = createSlice({
 
       .addCase(fetchGroupExpenses.pending, state => {
         state.expenseLoading = true;
+        state.expenses = [];
         state.expenseError = null;
       })
       .addCase(fetchGroupExpenses.fulfilled, (state, action) => {
@@ -99,6 +101,7 @@ const expenseSlice = createSlice({
 
       .addCase(fetchUserExpenseStats.pending, state => {
         state.expenseLoading = true;
+        state.expenseStats = null;
         state.expenseError = null;
       })
       .addCase(fetchUserExpenseStats.fulfilled, (state, action) => {

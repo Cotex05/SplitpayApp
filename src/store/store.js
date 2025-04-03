@@ -10,6 +10,7 @@ import groupManagerSlice from '../slices/groupManagerSlice';
 import paymentSlice from '../slices/paymentSlice';
 import upiSlice from '../slices/upiSlice';
 import statsSlice from '../slices/statsSlice';
+import profileSlice from '../slices/profileSlice';
 
 export const store = configureStore({
   reducer: {
@@ -24,6 +25,7 @@ export const store = configureStore({
     payment: paymentSlice,
     upi: upiSlice,
     stats: statsSlice,
+    profile: profileSlice,
   },
 });
 

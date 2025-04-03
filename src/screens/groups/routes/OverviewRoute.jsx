@@ -187,6 +187,14 @@ const OverviewRoute = ({data}) => {
     );
   }
 
+  if (balanceLoading) {
+    return (
+      <View style={{padding: 12}}>
+        <ActivityIndicator size="large" color={colors.tertiary} />
+      </View>
+    );
+  }
+
   return (
     <ScrollView
       refreshControl={

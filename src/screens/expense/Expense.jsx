@@ -23,7 +23,9 @@ import {showToastWithGravity} from '../../components/native/AndroidComponents';
 import {
   fetchExpenseCashFlow,
   fetchGroupExpenses,
+  fetchUserExpenseStats,
 } from '../../slices/expenseSlice';
+import {fetchUserGroupBalanceGraph} from '../../slices/balanceSlice';
 
 const ExpenseList = ({title, value}) => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -100,7 +102,9 @@ const Expense = ({route, navigation}) => {
       if (removeExpense.fulfilled.match(result)) {
         console.log('Expense removed fulfilled!');
         dispatch(fetchGroupExpenses(ids?.groupId));
+        dispatch(fetchUserGroupBalanceGraph(ids?.groupId));
         dispatch(fetchExpenseCashFlow(ids?.groupId));
+        dispatch(fetchUserExpenseStats());
         console.log('Removed expense ', response);
         showToastWithGravity('Expense removed!');
         navigation.goBack();

@@ -68,6 +68,7 @@ const paymentSlice = createSlice({
 
       .addCase(fetchUserPaymentsInGroup.pending, state => {
         state.paymentLoading = true;
+        state.payments = [];
         state.paymentError = null;
       })
       .addCase(fetchUserPaymentsInGroup.fulfilled, (state, action) => {

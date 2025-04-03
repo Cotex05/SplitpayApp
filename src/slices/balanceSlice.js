@@ -33,6 +33,7 @@ export const balanceSlice = createSlice({
     builder
       .addCase(fetchUserGroupBalanceGraph.pending, state => {
         state.balanceLoading = true;
+        state.balanceGraph = null;
         state.balanceError = null;
       })
       .addCase(fetchUserGroupBalanceGraph.fulfilled, (state, action) => {

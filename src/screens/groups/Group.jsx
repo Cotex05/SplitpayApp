@@ -217,30 +217,34 @@ const Group = ({route, navigation}) => {
             <ActivityIndicator size="large" color={colors.tertiary} />
           </View>
         ) : (
-          <TabView
-            renderTabBar={renderTabBar}
-            navigationState={{index, routes}}
-            renderScene={renderScene}
-            onIndexChange={setIndex}
-            initialLayout={{width: layout.width}}
-          />
+          <>
+            <TabView
+              renderTabBar={renderTabBar}
+              navigationState={{index, routes}}
+              renderScene={renderScene}
+              onIndexChange={setIndex}
+              initialLayout={{width: layout.width}}
+            />
+            <TouchableOpacity
+              activeOpacity={0.75}
+              onPress={() =>
+                navigation.navigate('ExpenseManager', {data: data})
+              }
+              style={{
+                backgroundColor: colors.primary,
+                position: 'absolute',
+                alignItems: 'center',
+                justifyContent: 'center',
+                bottom: 20,
+                right: 15,
+                width: 75,
+                height: 75,
+                borderRadius: 50,
+              }}>
+              <Ionicons name="wallet-outline" size={36} color={colors.header} />
+            </TouchableOpacity>
+          </>
         )}
-        <TouchableOpacity
-          activeOpacity={0.75}
-          onPress={() => navigation.navigate('ExpenseManager', {data: data})}
-          style={{
-            backgroundColor: colors.primary,
-            position: 'absolute',
-            alignItems: 'center',
-            justifyContent: 'center',
-            bottom: 20,
-            right: 15,
-            width: 75,
-            height: 75,
-            borderRadius: 50,
-          }}>
-          <Ionicons name="wallet-outline" size={36} color={colors.header} />
-        </TouchableOpacity>
       </SafeAreaView>
     </Suspense>
   );

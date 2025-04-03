@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Linking,
   Modal,
   Text,
   useColorScheme,
@@ -20,6 +21,7 @@ import {
 } from '../slices/expenseSlice';
 import {showToastWithGravity} from './native/AndroidComponents';
 import {fetchUserWeeklyExpenseStats} from '../slices/statsSlice';
+import {fetchUserUpi} from '../slices/upiSlice';
 
 const BottomModal = ({modalVisible, setModalVisible, data, groupData}) => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -35,6 +37,16 @@ const BottomModal = ({modalVisible, setModalVisible, data, groupData}) => {
 
   const processPayment = async paymentMethod => {
     try {
+      if (paymentMethod === 'UPI') {
+        const upiAddress = await getPayeeUpiAddress();
+        if (!upiAddress || upiAddress === '') {
+          showToastWithGravity('UPI Address not found this user!');
+          return;
+        }
+        const upiUrl = `upi://pay?pa=${upiAddress}&pn=${data.payee.fullName}&am=${data?.amount}&cu=INR&purpose=Splitpay Expense`;
+        console.log(upiUrl);
+        Linking.openURL(upiUrl);
+      }
       const request = {
         groupId: groupData?.groupId,
         payeeId: data?.payee?.userId,
@@ -49,12 +61,32 @@ const BottomModal = ({modalVisible, setModalVisible, data, groupData}) => {
       console.log('Result from processPayment', result);
       if (createPayment.fulfilled.match(result)) {
         console.log('Payment process fulfilled!');
-        showToastWithGravity('Payment successful!');
+        if (paymentMethod != 'UPI') {
+          showToastWithGravity('Payment successful!');
+        }
       } else {
         console.log('Payments processing failed:', result.payload);
       }
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const getPayeeUpiAddress = async () => {
+    try {
+      const result = await dispatch(fetchUserUpi(data?.payee?.username));
+
+      console.log('Result from getPayeeUpiAddress', result);
+      if (fetchUserUpi.fulfilled.match(result)) {
+        const upi = result.payload[0]?.upiAddress;
+        console.log('Payee upi details fetched fulfilled!', upi);
+        return upi;
+      } else {
+        console.log('Upi fetching failed:', result.payload);
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
     }
   };
 

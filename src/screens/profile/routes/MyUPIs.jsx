@@ -59,6 +59,10 @@ const MyUPIsScreen = ({route, navigation}) => {
 
   const addUpiAddress = async () => {
     try {
+      if (primaryUPI.trim().length === 0) {
+        showToastWithGravity('UPI Address cannot be empty!');
+        return;
+      }
       console.log('From addUpiAddress(): ', upiDetails, primaryUPI);
       const result = await dispatch(addUserUpi({upiDetails, primaryUPI}));
 

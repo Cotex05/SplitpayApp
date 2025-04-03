@@ -33,6 +33,7 @@ const statsSlice = createSlice({
     builder
       .addCase(fetchUserWeeklyExpenseStats.pending, state => {
         state.statsLoading = true;
+        state.lastWeekStats = [];
         state.statsError = null;
       })
       .addCase(fetchUserWeeklyExpenseStats.fulfilled, (state, action) => {

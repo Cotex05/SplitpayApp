@@ -52,6 +52,7 @@ const groupInfoSlice = createSlice({
     builder
       .addCase(fetchGroupInfo.pending, state => {
         state.loading = true;
+        state.groupData = null;
         state.error = null;
       })
       .addCase(fetchGroupInfo.fulfilled, (state, action) => {

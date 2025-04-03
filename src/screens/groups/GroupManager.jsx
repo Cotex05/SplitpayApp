@@ -55,7 +55,9 @@ const UserList = ({data, handleUserRemove}) => {
               borderRadius: 50,
             }}
             source={{
-              uri: 'https://w7.pngwing.com/pngs/81/570/png-transparent-profile-logo-computer-icons-user-user-blue-heroes-logo-thumbnail.png',
+              uri: data?.photoUrl
+                ? data?.photoUrl
+                : 'https://w7.pngwing.com/pngs/81/570/png-transparent-profile-logo-computer-icons-user-user-blue-heroes-logo-thumbnail.png',
             }}
           />
           <View
@@ -384,7 +386,9 @@ const GroupManager = ({route, navigation}) => {
                                 borderRadius: 50,
                               }}
                               source={{
-                                uri: 'https://w7.pngwing.com/pngs/81/570/png-transparent-profile-logo-computer-icons-user-user-blue-heroes-logo-thumbnail.png',
+                                uri: item?.photoUrl
+                                  ? item?.photoUrl
+                                  : 'https://w7.pngwing.com/pngs/81/570/png-transparent-profile-logo-computer-icons-user-user-blue-heroes-logo-thumbnail.png',
                               }}
                             />
                             <View style={{marginHorizontal: 18}}>

@@ -123,6 +123,10 @@ const Groups = ({navigation}) => {
     setJoinGroupModalVisible(true);
   };
 
+  const handleGroupRefresh = async () => {
+    fetchGroups();
+  };
+
   const dispatch = useDispatch();
   const {groups, loading, error, successMessage} = useSelector(
     state => state.group,
@@ -184,12 +188,19 @@ const Groups = ({navigation}) => {
             onPressAction={({nativeEvent}) => {
               if (nativeEvent.event == 'join') {
                 handleGroupJoin();
+              } else if (nativeEvent.event == 'refresh') {
+                handleGroupRefresh();
               }
             }}
             actions={[
               {
                 id: 'join',
                 title: 'Join group',
+                titleColor: colors.text,
+              },
+              {
+                id: 'refresh',
+                title: 'Refresh',
                 titleColor: colors.text,
               },
             ]}
